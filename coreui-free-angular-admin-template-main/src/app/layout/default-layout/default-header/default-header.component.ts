@@ -1,7 +1,7 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-
+import { UserserviceService } from '../../../services/userservice.service'; 
 import {
   AvatarComponent,
   BadgeComponent,
@@ -39,13 +39,15 @@ export class DefaultHeaderComponent extends HeaderComponent {
     { name: 'dark', text: 'Dark', icon: 'cilMoon' },
     { name: 'auto', text: 'Auto', icon: 'cilContrast' }
   ];
-
+onLogout(): void {
+  this.UserserviceService.logout();
+}
   readonly icons = computed(() => {
     const currentMode = this.colorMode();
     return this.colorModes.find(mode => mode.name === currentMode)?.icon ?? 'cilSun';
   });
 
-  constructor() {
+  constructor(private UserserviceService: UserserviceService) {
     super();
   }
 

@@ -1,0 +1,38 @@
+.form-modern {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+
+  .form-label {
+    font-weight: 600;
+  }
+
+  .form-control,
+  .form-select {
+    border-radius: 0.5rem;
+    transition: border-color 0.2s ease-in-out;
+
+    &:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+  }
+
+  .input-group-text {
+    background-color: #f1f3f5;
+    border: none;
+    border-radius: 0.5rem 0 0 0.5rem;
+  }
+
+  button {
+    font-weight: 600;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+  }
+}
+/* post-offre.component.scss */
+.error {
+  color: red;
+  font-size: 0.8em;
+}

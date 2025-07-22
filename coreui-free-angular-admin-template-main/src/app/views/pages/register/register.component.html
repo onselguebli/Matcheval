@@ -1,36 +1,123 @@
 <div class="bg-light dark:bg-transparent min-vh-100 d-flex flex-row align-items-center">
   <c-container>
     <c-row class="justify-content-center">
-      <c-col lg="7" md="9" xl="6">
-        <c-card class="mx-4">
-          <c-card-body class="p-4">
-            <form cForm>
-              <h1>Register</h1>
-              <p class="text-body-secondary">Create your account</p>
+      <c-col lg="8" md="10" xl="6">
+        <c-card class="shadow-lg border-0">
+          <c-card-body class="p-5">
+            <!-- ✅ Alerte affichée si showSuccess est vrai -->
+
+
+            <form cForm [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+              <h2 class="text-center mb-4 fw-bold">Créer un compte</h2>
+              <p class="text-center text-muted mb-4">Veuillez remplir les informations ci-dessous</p>
+
+              <!-- Prénom -->
               <c-input-group class="mb-3">
                 <span cInputGroupText>
-                  <svg cIcon name="cilUser"></svg>
+                  <svg cIcon name="cil-user"></svg>
                 </span>
-                <input autoComplete="name" cFormControl placeholder="Username" />
+                <input type="text" cFormControl placeholder="Prénom"  formControlName="firstname" />
               </c-input-group>
+
+              <!-- Nom -->
+              <c-input-group class="mb-3">
+                <span cInputGroupText>
+                  <svg cIcon name="cil-user"></svg>
+                </span>
+                <input type="text" cFormControl placeholder="Nom" formControlName="lastname" />
+              </c-input-group>
+
+              <!-- Email -->
               <c-input-group class="mb-3">
                 <span cInputGroupText>&#64;</span>
-                <input autoComplete="email" cFormControl placeholder="Email" />
+                <input type="email" cFormControl placeholder="Email professionnel"  formControlName="email" />
               </c-input-group>
+              <div class="text-danger small" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+                Email invalide ou vide
+              </div>
+
+              <!-- Mot de passe -->
               <c-input-group class="mb-3">
                 <span cInputGroupText>
-                  <svg cIcon name="cilLockLocked"></svg>
+                  <svg cIcon name="cil-lock-locked"></svg>
                 </span>
-                <input autoComplete="new-password" cFormControl placeholder="Password" type="password" />
+                <input type="password" cFormControl placeholder="Mot de passe sécurisé" formControlName="password" />
               </c-input-group>
+            <div class="text-danger small" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid">
+                 Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.
+              </div>
+              <!-- Date de naissance -->
+              <c-input-group class="mb-3">
+                <span cInputGroupText>
+                  <svg cIcon name="cil-calendar"></svg>
+                </span>
+                <input type="date" cFormControl formControlName="dnaiss" />
+              </c-input-group>
+
+              <!-- Civilité -->
+              <c-input-group class="mb-3">
+                <span cInputGroupText>
+                  <svg cIcon name="cil-user-female"></svg>
+                </span>
+                <select cSelect cFormControl class="form-select" formControlName="civility">
+                  <option [ngValue]="null" disabled selected>Choisir civilité</option>
+                  <option value="SINGLE">Célibataire</option>
+                  <option value="MARRIED">Marié(e)</option>
+                  <option value="DIVORCED">Divorcé(e)</option>
+                </select>
+              </c-input-group>
+
+              <!-- Numéro de téléphone -->
+              <c-input-group class="mb-3">
+                <span cInputGroupText>
+                  <svg cIcon name="cil-phone"></svg>
+                </span>
+                <input type="tel" cFormControl placeholder="Numéro de téléphone (+216...)"  formControlName="phonenumber" />
+              </c-input-group>
+
+              <!-- Compte actif -->
+              <c-input-group class="mb-3">
+                <span cInputGroupText>
+                  <svg cIcon name="cilCheck"></svg>
+                </span>
+                <select cSelect cFormControl class="form-select" formControlName="enabled">
+                  <option [ngValue]="null" disabled selected>Compte activé ?</option>
+                  <option value="true">Oui</option>
+                  <option value="false">Non</option>
+                </select>
+              </c-input-group>
+
+              <!-- Rôle -->
               <c-input-group class="mb-4">
                 <span cInputGroupText>
-                  <svg cIcon name="cilLockLocked"></svg>
+                  <svg cIcon name="cil-people"></svg>
                 </span>
-                <input autoComplete="new-password" cFormControl placeholder="Repeat password" type="password" />
+                <select  cSelect cFormControl class="form-select" formControlName="role"> >
+                  <option [ngValue]="null" disabled selected>Sélectionner un rôle</option>
+                  <option value="MANAGER">Manager</option>
+                  <option value="RECRUITER">Recruteur</option>
+                  <option value="ADMIN">Administrateur</option>
+                </select>
               </c-input-group>
+<!-- Sélection du manager si recruteur -->
+<div *ngIf="registerForm.get('role')?.value === 'RECRUITER'" class="mb-4">
+  <label for="manager" class="form-label fw-semibold">Manager associé</label>
+  <select cSelect cFormControl class="form-select" formControlName="managerId" id="manager">
+    <option [ngValue]="null" disabled selected>Choisir un manager</option>
+    <option *ngFor="let manager of managers" [value]="manager.id">
+      {{ manager.firstname }} {{ manager.lastname }} ({{ manager.email }})
+    </option>
+  </select>
+  <div class="text-danger small" *ngIf="registerForm.get('managerId')?.touched && registerForm.get('managerId')?.invalid">
+    Un manager doit être sélectionné pour un recruteur.
+  </div>
+</div>
+
+              <!-- Bouton -->
               <div class="d-grid">
-                <button cButton color="success">Create Account</button>
+                <button cButton color="secondary" size="lg" class="text-uppercase fw-semibold" type="submit" [disabled]="registerForm.invalid">
+                  <svg cIcon name="cil-user-follow" class="me-2"></svg> Créer le compte
+                </button>
               </div>
             </form>
           </c-card-body>

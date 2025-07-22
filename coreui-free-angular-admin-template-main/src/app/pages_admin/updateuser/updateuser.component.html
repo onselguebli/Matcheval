@@ -1,0 +1,88 @@
+ 
+ <h3 class="mb-4">Modifier l'utilisateur</h3>
+<form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="p-4">
+
+  <div class="row g-3">
+
+    <div class="col-md-6">
+      <label class="form-label">Prénom</label>
+      <input type="text" class="form-control" formControlName="firstname" placeholder="Prénom">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Nom</label>
+      <input type="text" class="form-control" formControlName="lastname" placeholder="Nom">
+    </div>
+
+   <div class="col-md-6">
+  <label class="form-label">Email</label>
+  <input type="email" class="form-control" formControlName="email" placeholder="Email">
+  <div class="text-danger mt-1" *ngIf="editForm.get('email')?.invalid && editForm.get('email')?.touched">
+    <small *ngIf="editForm.get('email')?.errors?.['required']">L'email est requis.</small>
+    <small *ngIf="editForm.get('email')?.errors?.['email']">Format d'email invalide.</small>
+  </div>
+</div>
+
+    <div class="col-md-6">
+      <label class="form-label">Date de naissance</label>
+      <input type="date" class="form-control" formControlName="dnaiss">
+    </div>
+
+    <div class="col-md-6">
+  <label class="form-label">Civilité</label>
+  <select class="form-select" formControlName="civility">
+    <option [ngValue]="null" disabled>Sélectionner la civilité</option>
+    <option value="SINGLE">Célibataire</option>
+    <option value="MARRIED">Marié(e)</option>
+    <option value="DIVORCED">Divorcé(e)</option>
+  </select>
+  <div class="text-danger mt-1" *ngIf="editForm.get('civility')?.invalid && editForm.get('civility')?.touched">
+    <small>La civilité est requise.</small>
+  </div>
+</div>
+
+
+   <div class="col-md-6">
+  <label class="form-label">Téléphone</label>
+  <input type="tel" class="form-control" formControlName="phonenumber" placeholder="Numéro de téléphone">
+  <div class="text-danger mt-1" *ngIf="editForm.get('phonenumber')?.invalid && editForm.get('phonenumber')?.touched">
+    <small *ngIf="editForm.get('phonenumber')?.errors?.['required']">Numéro requis.</small>
+    <small *ngIf="editForm.get('phonenumber')?.errors?.['pattern']">Le numéro doit comporter 8 chiffres.</small>
+  </div>
+</div>
+
+
+    <div class="col-md-6">
+  <label class="form-label">Rôle</label>
+  <select class="form-select" formControlName="role">
+    <option value="" disabled>Sélectionner un rôle</option>
+    <option value="ADMIN">Admin</option>
+    <option value="RECRUITER">Recruteur</option>
+    <option value="MANAGER">Manager</option>
+  </select>
+  <div class="text-danger mt-1" *ngIf="editForm.get('role')?.invalid && editForm.get('role')?.touched">
+    <small>Le rôle est requis.</small>
+  </div>
+</div>
+
+    <div class="col-md-6">
+      <label class="form-label">Compte activé ?</label>
+      <select class="form-select" formControlName="enabled">
+        <option [ngValue]="null" disabled selected>-- Choisir --</option>
+        <option [ngValue]="true">Oui</option>
+        <option [ngValue]="false">Non</option>
+      </select>
+    </div>
+
+  <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+  <button type="submit" class="btn btn-primary">
+    Mettre à jour
+  </button>
+  <button type="button" class="btn btn-secondary" (click)="formClosed.emit(false)">
+    Annuler
+  </button>
+</div>
+
+
+  </div>
+</form>

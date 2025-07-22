@@ -1,0 +1,19 @@
+<c-pagination class="justify-content-center mt-3">
+  <li cPageItem [class.disabled]="currentPage === 1">
+    <a cPageLink (click)="changePage(currentPage - 1)">
+      &laquo;
+    </a>
+  </li>
+
+  <li cPageItem *ngFor="let page of pages()" [class.active]="currentPage === page">
+    <a cPageLink (click)="changePage(page)">
+      {{ page }}
+    </a>
+  </li>
+
+  <li cPageItem [class.disabled]="currentPage === totalPages">
+    <a cPageLink (click)="changePage(currentPage + 1)">
+      &raquo;
+    </a>
+  </li>
+</c-pagination>

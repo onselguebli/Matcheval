@@ -1,0 +1,90 @@
+<div class="container mt-5">
+  <h3 class="mb-4"><i class="fas fa-briefcase me-2"></i>Publier une offre</h3>
+
+  <form (ngSubmit)="submitForm(offreForm)" #offreForm="ngForm" class="form-modern" novalidate>
+
+    <!-- Titre -->
+    <fieldset class="mb-3">
+      <legend><i class="me-2"></i>Titre *</legend>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fas fa-heading"></i></span>
+        <input type="text" class="form-control" placeholder="Titre de l'offre"
+               [(ngModel)]="offre.titre" name="titre" required #titre="ngModel">
+      </div>
+      <div *ngIf="titre.invalid && titre.touched" class="text-danger mt-1">Titre est obligatoire</div>
+    </fieldset>
+
+    <!-- Description -->
+    <fieldset class="mb-3">
+      <legend><i class="me-2"></i>Description *</legend>
+      <textarea class="form-control" rows="3" placeholder="Décris le poste..."
+                [(ngModel)]="offre.description" name="description" required #description="ngModel"></textarea>
+      <div *ngIf="description.invalid && description.touched" class="text-danger mt-1">Description obligatoire</div>
+    </fieldset>
+
+    <!-- Exigences -->
+    <fieldset class="mb-3">
+      <legend><i class="me-2"></i>Exigences</legend>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fas fa-list-check"></i></span>
+        <input class="form-control" placeholder="Exigences du poste"
+               [(ngModel)]="offre.exigences" name="exigences">
+      </div>
+    </fieldset>
+
+    <!-- Localisation -->
+    <fieldset class="mb-3">
+      <legend><i class="me-2"></i>Localisation</legend>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+        <input class="form-control" placeholder="Localisation"
+               [(ngModel)]="offre.localisation" name="localisation">
+      </div>
+    </fieldset>
+
+    <!-- Dates -->
+    <div class="row">
+      <fieldset class="col-md-6 mb-3">
+        <legend><i class="me-2"></i>Date de publication *</legend>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fas fa-calendar-plus"></i></span>
+          <input class="form-control" type="date"
+                 [(ngModel)]="offre.datePublication" name="datePublication" required #datePublication="ngModel">
+        </div>
+        <div *ngIf="datePublication.invalid && datePublication.touched" class="text-danger mt-1">
+          Date de publication requise
+        </div>
+      </fieldset>
+
+      <fieldset class="col-md-6 mb-3">
+        <legend><i class="me-2"></i>Date d'expiration *</legend>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fas fa-calendar-times"></i></span>
+          <input class="form-control" type="date"
+                 [(ngModel)]="offre.dateExpiration" name="dateExpiration" required #dateExpiration="ngModel">
+        </div>
+        <div *ngIf="dateExpiration.invalid && dateExpiration.touched" class="text-danger mt-1">
+          Date d’expiration requise
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- Statut -->
+    <fieldset class="mb-4">
+      <legend><i class="me-2"></i>Statut *</legend>
+      <select class="form-select"
+              [(ngModel)]="offre.statut" name="statut" required #statut="ngModel">
+        <option [ngValue]="null" disabled selected>Choisir la statut</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+      <div *ngIf="statut.invalid && statut.touched" class="text-danger mt-1">Statut requis</div>
+    </fieldset>
+
+    <!-- Bouton -->
+    <button type="submit" class="btn btn-primary w-100" >
+      <i class="fas fa-paper-plane me-2"></i>Publier
+    </button>
+
+  </form>
+</div>

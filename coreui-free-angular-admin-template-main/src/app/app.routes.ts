@@ -1,23 +1,52 @@
 import { Routes } from '@angular/router';
+import { RoleGuard } from '../app/guards/role.guard';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'login',
     pathMatch: 'full'
   },
+ 
   {
-    path: '',
-    loadComponent: () => import('./layout').then(m => m.DefaultLayoutComponent),
-    data: {
-      title: 'Home'
-    },
+    path: 'manager-dashboard',
+    loadComponent: () =>
+      import('./layout/manager-lay/manager-layout/manager-layout.component').then((c) => c.ManagerLayoutComponent),
+    canActivate: [RoleGuard],
+    data: { expectedRole: 'MANAGER' }
+  },
+  {
+    path: 'recruiter-dashboard',
+    loadComponent: () =>
+      import('./layout/recruiter-lay/recruiter-layout/recruiter-layout.component').then((c) => c.RecruiterLayoutComponent),
+    canActivate: [RoleGuard],
+    data: { expectedRole: 'RECRUITER' },
     children: [
       {
-        path: 'dashboard',
-        loadChildren: () => import('./views/dashboard/routes').then((m) => m.routes)
-      },
-      {
+      path: 'pages_recruteur',
+      loadChildren: () => import('./pages_recruteur/routes').then(m => m.routes)
+      
+    }
+    ]
+  },
+  {
+    path: 'admin-dashboard',
+    loadComponent: () =>
+      import('./layout/admin-lay/admin-layout/admin-layout.component').then((c) => c.AdminLayoutComponent),
+    canActivate: [RoleGuard],
+    data: { expectedRole: 'ADMIN' },
+     children: [
+    {
+      path: 'pages',
+      loadChildren: () => import('./views/pages/routes').then(m => m.routes)
+      
+    },
+    {
+      path: 'pages_admin',
+      loadChildren: () => import('./pages_admin/routes').then(m => m.routes)
+      
+    },
+    {
         path: 'theme',
         loadChildren: () => import('./views/theme/routes').then((m) => m.routes)
       },
@@ -54,7 +83,9 @@ export const routes: Routes = [
         loadChildren: () => import('./views/pages/routes').then((m) => m.routes)
       }
     ]
+  
   },
+ 
   {
     path: '404',
     loadComponent: () => import('./views/pages/page404/page404.component').then(m => m.Page404Component),
@@ -76,12 +107,6 @@ export const routes: Routes = [
       title: 'Login Page'
     }
   },
-  {
-    path: 'register',
-    loadComponent: () => import('./views/pages/register/register.component').then(m => m.RegisterComponent),
-    data: {
-      title: 'Register Page'
-    }
-  },
-  { path: '**', redirectTo: 'dashboard' }
+  
+  { path: '**', redirectTo: 'login' }
 ];
