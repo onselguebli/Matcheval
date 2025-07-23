@@ -8,76 +8,76 @@
     (input)="filterUsers()" />
 </div>
 
-<!-- Tableau principal -->
-<table cTable hover striped>
-  <thead>
-    <tr>
-      <th scope="col">Prénom</th>
-      <th scope="col">Nom</th>
-      <th scope="col">Email</th>
-      <th scope="col">Date de naissance</th>
-      <th scope="col">Role</th>
-      <th scope="col">Civilité</th>
-      <th scope="col">Téléphone</th>
-      <th scope="col">Status</th>
-      <th scope="col">Actions</th>
-    </tr>
-  </thead>
+<!-- Boucle sur chaque rôle -->
+<ng-container *ngFor="let role of roles">
+  <h5 class="mt-4 mb-2">{{ role }}</h5>
 
-  <tbody>
-    <ng-container *ngFor="let user of paginatedUsers">
-      <!-- Ligne principale utilisateur -->
-      <tr (click)="user.role === 'MANAGER' ? showRecruteurs(user.id) : null">
-        <td>{{ user.firstname }}</td>
-        <td>{{ user.lastname }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.dnaiss | date: 'dd/MM/yyyy' }}</td>
-        <td>{{ user.role }}</td>
-        <td>{{ user.civility }}</td>
-        <td>{{ user.phonenumber }}</td>
-        <td>
-          <button
-            class="btn btn-sm px-3 py-1 fw-semibold shadow-sm border-0 transition-all"
-            [ngClass]="user.enabled ? 'btn-status-active' : 'btn-status-inactive'"
-            (click)="toggleActivation(user); $event.stopPropagation()">
-            {{ user.enabled ? 'Activer' : 'Désactiver' }}
-          </button>
-        </td>
-        <td>
-          <button class="btn btn-sm btn-outline-primary fw-semibold px-3 py-1 shadow-sm transition-all"
-            (click)="showUpdateForm(user.id); $event.stopPropagation()">
-            Modifier
-          </button>
-        </td>
+  <table cTable hover striped>
+    <thead>
+      <tr>
+        <th>Prénom</th>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Date de naissance</th>
+        <th>Role</th>
+        <th>Civilité</th>
+        <th>Téléphone</th>
+        <th>Status</th>
+        <th>Actions</th>
       </tr>
-
-      
-      <!-- Tableau imbriqué des recruteurs -->
-<tr *ngIf="selectedManagerId === user.id && recruteursOfManager.length > 0">
-  <td colspan="9">
-    <div class="embedded-title">👥 Recruteurs associés</div>
-    <table class="embedded-table">
-      <thead>
-        <tr>
-          <th>Prénom</th>
-          <th>Nom</th>
-          <th>Email</th>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let user of usersByRole[role]">
+        <tr (click)="user.role === 'MANAGER' ? showRecruteurs(user.id) : null">
+          <td>{{ user.firstname }}</td>
+          <td>{{ user.lastname }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.dnaiss | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ user.role }}</td>
+          <td>{{ user.civility }}</td>
+          <td>{{ user.phonenumber }}</td>
+          <td>
+            <button
+              class="btn btn-sm px-3 py-1 fw-semibold shadow-sm border-0 transition-all"
+              [ngClass]="user.enabled ? 'btn-status-active' : 'btn-status-inactive'"
+              (click)="toggleActivation(user); $event.stopPropagation()">
+              {{ user.enabled ? 'Activer' : 'Désactiver' }}
+            </button>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary fw-semibold px-3 py-1 shadow-sm transition-all"
+              (click)="showUpdateForm(user.id); $event.stopPropagation()">
+              Modifier
+            </button>
+          </td>
         </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let recruteur of recruteursOfManager">
-          <td>{{ recruteur.firstname }}</td>
-          <td>{{ recruteur.lastname }}</td>
-          <td>{{ recruteur.email }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </td>
-</tr>
 
-    </ng-container>
-  </tbody>
-</table>
+        <!-- Tableau imbriqué pour les managers -->
+        <tr *ngIf="selectedManagerId === user.id && recruteursOfManager.length > 0">
+          <td colspan="9">
+            <div class="embedded-title">👥 Recruteurs associés</div>
+            <table class="embedded-table">
+              <thead>
+                <tr>
+                  <th>Prénom</th>
+                  <th>Nom</th>
+                  <th>Email</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let recruteur of recruteursOfManager">
+                  <td>{{ recruteur.firstname }}</td>
+                  <td>{{ recruteur.lastname }}</td>
+                  <td>{{ recruteur.email }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</ng-container>
 
 <!-- Pagination -->
 <div>

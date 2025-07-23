@@ -5,7 +5,7 @@ import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/ro
 import { delay, filter, map, tap } from 'rxjs/operators';
 
 import { ColorModeService } from '@coreui/angular';
-import { ToastComponent } from './toast/toast/toast.component';
+import {  ToastComponent1 } from './toast/toast/toast.component1';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
 
@@ -15,7 +15,7 @@ import { iconSubset } from './icons/icon-subset';
     <router-outlet></router-outlet>
     <app-toast></app-toast> 
   `,
-    imports: [RouterOutlet, ToastComponent],
+    imports: [RouterOutlet, ToastComponent1],
 })
 export class AppComponent implements OnInit {
   title = 'CoreUI Angular Admin Template';

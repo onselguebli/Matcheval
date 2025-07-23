@@ -12,8 +12,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService {
@@ -88,6 +88,7 @@ public ReqRes login(ReqRes loginRequest) {
             user.setFirstname(registrationRequest.getFirstname());
             user.setLastname(registrationRequest.getLastname());
             user.setCivility(registrationRequest.getCivility());
+            user.setCreatedAt(new Date());
             user.setDnaiss(registrationRequest.getDnaiss());
             user.setPhonenumber(registrationRequest.getPhonenumber());
             user.setEnabled(registrationRequest.getEnabled());
@@ -267,6 +268,34 @@ public ReqRes login(ReqRes loginRequest) {
     }
     public List<Users> findRecruteursByManagerId(Long managerId) {
         return userRepo.findByManagerId(managerId);  // Assure-toi que ce repo existe
+    }
+
+    @Override
+    public Map<String, Long> countUsersByRole() {
+        List<Object[]> results = userRepo.countUsersByRole();
+
+        Map<String, Long> roleCounts = new HashMap<>();
+        for (Object[] row : results) {
+            String role = row[0].toString(); // u.role is an enum
+            Long count = (Long) row[1];
+            roleCounts.put(role, count);
+        }
+
+        return roleCounts;
+    }
+
+    @Override
+    public Map<Integer, Long> countUsersByYear() {
+        List<Object[]> results = userRepo.countUsersByYear();
+
+        Map<Integer, Long> yearCounts = new HashMap<>();
+        for (Object[] row : results) {
+            Integer year = (Integer) row[0];
+            Long count = (Long) row[1];
+            yearCounts.put(year, count);
+        }
+
+        return yearCounts;
     }
 
 }

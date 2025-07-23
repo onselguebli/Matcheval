@@ -21,4 +21,7 @@ public interface IUserService {
      ReqRes getManagers();
 
     List<Users> findRecruteursByManagerId(Long managerId);
+     Map<String, Long> countUsersByRole();
+
+    public Map<Integer, Long> countUsersByYear();
 }

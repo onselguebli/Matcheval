@@ -24,7 +24,8 @@ export class ListusersComponent {
   filteredUsers: User[] = [];
   selectedManagerId: number | null = null;
   recruteursOfManager: User[] = [];
- 
+ usersByRole: { [role: string]: User[] } = {};
+  roles: string[] = [];
 
   constructor(private adminService: AdminService) {}
 
@@ -44,9 +45,11 @@ loadUsers(): void {
   this.adminService.getAllUsers().subscribe({
     next: data => {
       this.users = data.listusers;
-      this.filteredUsers = this.users; 
+      this.filteredUsers = this.users;
+      this.usersByRole = this.getUsersByRole();
+      this.roles = Object.keys(this.usersByRole);
     },
-    error: err => console.error(' Erreur chargement utilisateurs', err)
+    error: err => console.error('Erreur chargement utilisateurs', err)
   });
 }
 handleFormClosed(updated: boolean): void {
@@ -79,14 +82,33 @@ onPageChange(page: number): void {
   this.currentPage = page;
 }
 showRecruteurs(managerId: number): void {
-  this.selectedManagerId = managerId;
-  this.adminService.getRecruteursByManager(managerId).subscribe({
-    next: data => {
-      this.recruteursOfManager = data;
-    },
-    error: err => {
-      console.error('Erreur chargement recruteurs', err);
-    }
-  });
+  if (this.selectedManagerId === managerId) {
+    
+    this.selectedManagerId = null;
+    this.recruteursOfManager = [];
+  } else {
+   
+    this.selectedManagerId = managerId;
+    this.adminService.getRecruteursByManager(managerId).subscribe({
+      next: data => {
+        this.recruteursOfManager = data;
+      },
+      error: err => {
+        console.error('Erreur chargement recruteurs', err);
+      }
+    });
+  }
 }
+
+getUsersByRole(): { [role: string]: User[] } {
+  const list = this.filteredUsers.length > 0 || this.searchEmail ? this.filteredUsers : this.users;
+  return list.reduce((acc, user) => {
+    if (!acc[user.role]) {
+      acc[user.role] = [];
+    }
+    acc[user.role].push(user);
+    return acc;
+  }, {} as { [role: string]: User[] });
+}
+
 }

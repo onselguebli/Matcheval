@@ -88,4 +88,21 @@ block(id: number): Observable<{ user: User }> {
   );
 }
 
+getUserStatsByRole(): Observable<any> {
+  const token = this.authService.getToken();
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  });
+  return this.http.get<Map<string, number>>(`${this.BASE_URL}/admin/stats/users-by-role`, { headers });
+}
+getUsersPerYear(): Observable<any> {
+  const token = this.authService.getToken();
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  });
+  return this.http.get<Map<number, number>>(`${this.BASE_URL}/admin/stats/users-per-year`, { headers });
+}
+
 }

@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("admin")
@@ -61,6 +62,18 @@ public class AdminController {
     public ResponseEntity<List<Users>> getRecruteursParManager(@PathVariable Long managerId) {
         List<Users> recruteurs = userService.findRecruteursByManagerId(managerId);
         return ResponseEntity.ok(recruteurs);
+    }
+
+    @GetMapping("/stats/users-by-role")
+    public ResponseEntity<Map<String, Long>> getUserCountByRole() {
+        Map<String, Long> stats = userService.countUsersByRole();
+        return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/stats/users-per-year")
+    public ResponseEntity<Map<Integer, Long>> getUsersPerYear() {
+        Map<Integer, Long> stats = userService.countUsersByYear();
+        return ResponseEntity.ok(stats);
     }
 
 }

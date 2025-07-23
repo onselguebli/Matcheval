@@ -1,38 +1,4 @@
 <app-widgets-dropdown />
-<c-card class="my-4 chart-card">
-  <c-card-header class="text-center">👤 Répartition des utilisateurs par rôle</c-card-header>
-  <c-card-body>
-    <c-chart
-      type="doughnut"
-      style="max-width: 300px; max-height: 300px; margin: 0 auto"
-      [data]="{
-        labels: userRoles,
-        datasets: [{
-          data: userCounts,
-          backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc']
-        }]
-      }"
-    ></c-chart>
-  </c-card-body>
-</c-card>
-
-<c-card class="mt-4">
-  <c-card-header class="text-center">📅 Utilisateurs par année de création</c-card-header>
-  <c-card-body>
-    <c-chart
-      type="bar"
-      [height]="300"
-      [data]="{
-        labels: userYears,
-        datasets: [{
-          label: 'Comptes créés',
-          data: userCountsPerYear,
-          backgroundColor: '#36b9cc'
-        }]
-      }"
-    ></c-chart>
-  </c-card-body>
-</c-card>
 
 <c-card class="my-4">
   <c-card-body>

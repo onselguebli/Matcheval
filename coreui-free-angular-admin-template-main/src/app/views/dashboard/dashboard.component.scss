@@ -5,3 +5,20 @@
     }
   }
 }
+.chart-card {
+  width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.chart-card c-card-body {
+  padding: 1rem;
+}
+
+.text-center  {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}

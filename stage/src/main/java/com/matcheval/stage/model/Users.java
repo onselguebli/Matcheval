@@ -22,6 +22,7 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private Civility civility;
     private String phonenumber;
+    private Date createdAt;
     private boolean locked=false;
     private boolean enabled=true;
     @Column(nullable = false)

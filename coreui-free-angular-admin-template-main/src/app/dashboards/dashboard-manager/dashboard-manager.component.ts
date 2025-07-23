@@ -1,30 +1,13 @@
 import { NgStyle } from '@angular/common';
 import { Component, DestroyRef, DOCUMENT, effect, inject, OnInit, Renderer2, signal, WritableSignal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { ChartOptions } from 'chart.js';
-import {
-  AvatarComponent,
-  ButtonDirective,
-  ButtonGroupComponent,
-  CardBodyComponent,
-  CardComponent,
-  CardFooterComponent,
-  CardHeaderComponent,
-  ColComponent,
-  FormCheckLabelDirective,
-  GutterDirective,
-  ProgressComponent,
-  RowComponent,
-  TableDirective
-} from '@coreui/angular';
+import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, ButtonGroupComponent, FormCheckLabelDirective, CardFooterComponent, GutterDirective, ProgressComponent, CardHeaderComponent, TableDirective, AvatarComponent } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
 import { IconDirective } from '@coreui/icons-angular';
-
-import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.component';
-import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
-import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
-import { AdminService } from '../../services/admin.service';
-
+import { ChartOptions } from 'chart.js';
+import { WidgetsBrandComponent } from '../../../app/views/widgets/widgets-brand/widgets-brand.component';
+import { WidgetsDropdownComponent } from '../../../app/views/widgets/widgets-dropdown/widgets-dropdown.component';
+import { DashboardChartsData, IChartProps } from './dashboard-manager-charts-data';
 interface IUser {
   name: string;
   state: string;
@@ -40,20 +23,13 @@ interface IUser {
 }
 
 @Component({
-  templateUrl: 'dashboard.component.html',
-  styleUrls: ['dashboard.component.scss'],
-  imports: [WidgetsDropdownComponent, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent]
+  selector: 'app-dashboard-manager',
+  imports: [WidgetsDropdownComponent, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent],
+  templateUrl: './dashboard-manager.component.html',
+  styleUrl: './dashboard-manager.component.scss'
 })
-export class DashboardComponent implements OnInit {
-
-  userRoles: string[] = [];
-  userCounts: number[] = [];
-  userYears: number[] = [];
-  userCountsPerYear: number[] = [];
-   constructor(private adminService: AdminService) {}
-////////////*** lfou9 jdyyyd ******** *////////////
-
-  readonly #destroyRef: DestroyRef = inject(DestroyRef);
+export class DashboardManagerComponent implements OnInit {
+ readonly #destroyRef: DestroyRef = inject(DestroyRef);
   readonly #document: Document = inject(DOCUMENT);
   readonly #renderer: Renderer2 = inject(Renderer2);
   readonly #chartsData: DashboardChartsData = inject(DashboardChartsData);
@@ -151,8 +127,10 @@ export class DashboardComponent implements OnInit {
     trafficRadio: new FormControl('Month')
   });
 
- 
-   
+  ngOnInit(): void {
+    this.initCharts();
+    this.updateChartOnColorModeChange();
+  }
 
   initCharts(): void {
     this.mainChartRef()?.stop();
@@ -191,35 +169,4 @@ export class DashboardComponent implements OnInit {
       });
     }
   }
-
-  //***************jdyyyd te3iii */
-   ngOnInit(): void {
-    this.loadUserStats();
-    this.loadUsersPerYear();
-    this.initCharts();
-    this.updateChartOnColorModeChange();
-  }
-
-   loadUserStats() {
-    this.adminService.getUserStatsByRole().subscribe({
-      next: data => {
-        this.userRoles = Object.keys(data);
-        this.userCounts = Object.values(data);
-      },
-      error: err => {
-        console.error('Erreur chargement statistiques', err);
-      }
-    });
-  }
-  loadUsersPerYear() {
-  this.adminService.getUsersPerYear().subscribe({
-    next: (data) => {
-      this.userYears = Object.keys(data).map(y => +y);
-      this.userCountsPerYear = Object.values(data);
-    },
-    error: (err) => {
-      console.error("Erreur chargement stats par année", err);
-    }
-  });
-}
 }

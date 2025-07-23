@@ -1,0 +1,39 @@
+.login-card {
+  border-top-left-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+}
+
+
+
+input[cFormControl]::placeholder {
+  color: #adb5bd;
+  font-size: 0.95rem;
+}
+.login-side {
+  background: linear-gradient(135deg, #4e73df, #1cc88a);
+  border-top-right-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  color: #ffffff;
+
+  // Optionnel : superposition légère pour contraste
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.15); // assombrit légèrement le fond
+    z-index: 0;
+  }
+
+  c-card-body {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.login-description {
+  color: #f1f1f1;
+  font-size: 0.95rem;
+}
