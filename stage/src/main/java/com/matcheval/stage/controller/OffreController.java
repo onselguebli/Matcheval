@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("recruiter")
@@ -39,5 +40,8 @@ public class OffreController {
         offreService.extraireCandidaturesDepuisSitesExternes(offre);
         return ResponseEntity.ok("Importation des candidatures lancée pour l'offre ID " + offreId);
     }
+
+
+
 }
 

@@ -1,6 +1,6 @@
-import { NgStyle } from '@angular/common';
-import { Component, DestroyRef, DOCUMENT, effect, inject, OnInit, Renderer2, signal, WritableSignal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule, NgStyle } from '@angular/common';
+import { ChangeDetectorRef, Component, DestroyRef, DOCUMENT, effect, inject, OnInit, Renderer2, signal, WritableSignal } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChartOptions } from 'chart.js';
 import {
   AvatarComponent,
@@ -13,17 +13,21 @@ import {
   ColComponent,
   FormCheckLabelDirective,
   GutterDirective,
+  PaginationComponent,
   ProgressComponent,
   RowComponent,
   TableDirective
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
 import { IconDirective } from '@coreui/icons-angular';
-
+import { Pagination1Component } from "../../pagination-1/pagination-1.component";
 import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.component';
 import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
 import { AdminService } from '../../services/admin.service';
+import { WidgetsDropdownComponentNew } from '../widgets/widgets-dropdown-new/widgets-dropdown.componentNew';
+import { StatService } from '../../services/stat.service';
+import { TrafficDashboardDTO } from '../../models/TrafficDashboar';
 
 interface IUser {
   name: string;
@@ -42,15 +46,33 @@ interface IUser {
 @Component({
   templateUrl: 'dashboard.component.html',
   styleUrls: ['dashboard.component.scss'],
-  imports: [WidgetsDropdownComponent, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent]
+  imports: [WidgetsDropdownComponent,CardComponent, Pagination1Component, FormsModule,CommonModule, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent]
 })
 export class DashboardComponent implements OnInit {
-
+constructor(private statService: StatService,private cdRef: ChangeDetectorRef) {}
   userRoles: string[] = [];
   userCounts: number[] = [];
   userYears: number[] = [];
   userCountsPerYear: number[] = [];
-   constructor(private adminService: AdminService) {}
+  userStatusLabels: string[] = [];
+  userStatusCounts: number[] = [];
+  userCivilityLabels: string[] = [];
+  userCivilityCounts: number[] = [];
+  recruteurLabels: string[] = [];
+recruteurCounts: number[] = [];
+public totalCVs = 0;
+public totalOffres = 0;
+public totalRecruteurs = 0;
+activeUsersToday: number = 0;
+stats: any[] = [];
+statsSorted: any[] = [];
+maxOffres: number = 0;
+searchTerm: string = '';
+filteredStats: any[] = [];
+currentPage: number = 1;
+itemsPerPage: number = 8;
+
+
 ////////////*** lfou9 jdyyyd ******** *////////////
 
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
@@ -141,11 +163,7 @@ export class DashboardComponent implements OnInit {
 
   public mainChart: IChartProps = { type: 'line' };
   public mainChartRef: WritableSignal<any> = signal(undefined);
-  #mainChartRefEffect = effect(() => {
-    if (this.mainChartRef()) {
-      this.setChartStyles();
-    }
-  });
+  
   public chart: Array<IChartProps> = [];
   public trafficRadioGroup = new FormGroup({
     trafficRadio: new FormControl('Month')
@@ -155,15 +173,9 @@ export class DashboardComponent implements OnInit {
    
 
   initCharts(): void {
-    this.mainChartRef()?.stop();
-    this.mainChart = this.#chartsData.mainChart;
-  }
-
-  setTrafficPeriod(value: string): void {
-    this.trafficRadioGroup.setValue({ trafficRadio: value });
-    this.#chartsData.initMainChart(value);
-    this.initCharts();
-  }
+  this.mainChartRef()?.stop();
+  this.setChartStyles(); // ✅ Forcer le rafraîchissement visuel
+}
 
   handleChartRef($chartRef: any) {
     if ($chartRef) {
@@ -194,14 +206,21 @@ export class DashboardComponent implements OnInit {
 
   //***************jdyyyd te3iii */
    ngOnInit(): void {
+    this.loadUsersByCivility();
+    this.loadUsersByStatus();
+    this.getOffresParRecruteur();
+    this.getActiveUsersToday();
     this.loadUserStats();
     this.loadUsersPerYear();
+    this.loadRecruteursPerManagerStats();
+    this.loadUsersByStatus();
     this.initCharts();
     this.updateChartOnColorModeChange();
+     this.setTrafficPeriod('Month');
   }
 
    loadUserStats() {
-    this.adminService.getUserStatsByRole().subscribe({
+    this.statService.getUserStatsByRole().subscribe({
       next: data => {
         this.userRoles = Object.keys(data);
         this.userCounts = Object.values(data);
@@ -212,7 +231,7 @@ export class DashboardComponent implements OnInit {
     });
   }
   loadUsersPerYear() {
-  this.adminService.getUsersPerYear().subscribe({
+  this.statService.getUsersPerYear().subscribe({
     next: (data) => {
       this.userYears = Object.keys(data).map(y => +y);
       this.userCountsPerYear = Object.values(data);
@@ -222,4 +241,171 @@ export class DashboardComponent implements OnInit {
     }
   });
 }
+loadUsersByStatus() {
+  this.statService.getUsersByStatus().subscribe({
+    next: (data) => {
+      this.userStatusLabels = Object.keys(data);
+      this.userStatusCounts = Object.values(data);
+    },
+    error: (err) => {
+      console.error("Erreur stats status", err);
+    }
+  });
+}
+
+loadUsersByCivility() {
+  this.statService.getUsersByCivility().subscribe({
+    next: (data) => {
+      this.userCivilityLabels = Object.keys(data);
+      this.userCivilityCounts = Object.values(data);
+    },
+    error: (err) => console.error("Erreur stats civilité", err)
+  });
+}
+
+loadRecruteursPerManagerStats(): void {
+  this.statService.getRecruteursPerManagerStats().subscribe({
+    next: (data) => {
+      this.recruteurLabels = Object.keys(data);
+      this.recruteurCounts = Object.values(data);
+    },
+    error: (err) => console.error('Erreur chargement stats recruteurs par manager', err)
+  });
+}
+recruteursChartOptions: any = {
+  responsive: true,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      callbacks: {
+        label: function (ctx: any) {
+          return ctx.raw + ' recruteur(s)';
+        }
+      }
+    }
+  },
+  scales: {
+    x: {
+      ticks: { maxRotation: 90, minRotation: 45 },
+      title: { display: true, text: 'Email du manager' }
+    },
+    y: {
+      beginAtZero: true,
+      title: { display: true, text: 'Nombre de recruteurs' }
+    }
+  }
+};
+setTrafficPeriod(value: string): void {
+ 
+  this.trafficRadioGroup.setValue({ trafficRadio: value });
+
+  this.statService.getTrafficStats(value).subscribe((data) => {
+  
+
+    this.mainChart = { ...this.buildMainChart(data) }; 
+    this.totalCVs = data.totalCVs;
+    this.totalOffres = data.totalOffres;
+    this.totalRecruteurs = data.totalRecruteurs;
+    this.initCharts();
+  });
+}
+buildMainChart(data: TrafficDashboardDTO): IChartProps {
+  return {
+    type: 'line',
+    data: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: 'CVs',
+          backgroundColor: 'rgba(0,123,255,0.1)',
+          borderColor: 'rgba(0,123,255,1)',
+          data: data.nbCVs,
+          fill: false,
+          tension: 0.4
+        },
+        {
+          label: 'Offres',
+          backgroundColor: 'rgba(40,167,69,0.1)',
+          borderColor: 'rgba(40,167,69,1)',
+          data: data.nbOffres,
+          fill: false,
+          tension: 0.4
+        },
+        {
+          label: 'Recruteurs',
+          backgroundColor: 'rgba(255,193,7,0.1)',
+          borderColor: 'rgba(255,193,7,1)',
+          data: data.nbRecruteurs,
+          fill: false,
+          tension: 0.4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          display: true,
+          title: { display: true, text: 'Période' }
+        },
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: 'Nombre' }
+        }
+      }
+    }
+  };
+}
+  getActiveUsersToday() {
+    this.statService.getActiveUsersToday().subscribe({
+      next: (count) => {
+        this.activeUsersToday = count;
+      },
+      error: (err) => {
+        console.error('Erreur chargement utilisateurs actifs aujourd\'hui', err);
+      }
+    });
+  }
+  getCVsToday() {
+    this.statService.getCVsToday().subscribe({
+      next: (count) => {
+        this.totalCVs = count;
+      },
+      error: (err) => {
+        console.error('Erreur chargement CVs aujourd\'hui', err);
+      }
+    });
+  }
+ getOffresParRecruteur() {
+  this.statService.getOffresParRecruteur().subscribe({
+    next: (data) => {
+      this.statsSorted = [...data].sort((a, b) => b.nombreOffres - a.nombreOffres);
+      this.maxOffres = this.statsSorted[0]?.nombreOffres || 0;
+        this.filterStats(); 
+    },
+    error: (err) => {
+      console.error('Erreur chargement stats', err);
+      this.statsSorted = [];
+      this.maxOffres = 0;
+    }
+  });
+}
+filterStats() {
+  this.currentPage = 1;
+  this.filteredStats = this.searchTerm
+    ? this.statsSorted.filter(stat =>
+        stat.recruteurEmail.toLowerCase().includes(this.searchTerm.toLowerCase())
+      )
+    : [...this.statsSorted];
+}
+
+get paginatedStats(): any[] {
+  const start = (this.currentPage - 1) * this.itemsPerPage;
+  return this.filteredStats.slice(start, start + this.itemsPerPage);
+}
+
+onPageChanged(page: number): void {
+  this.currentPage = page;
+}
+
 }

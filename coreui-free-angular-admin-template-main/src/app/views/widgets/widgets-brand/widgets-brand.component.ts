@@ -1,8 +1,16 @@
-import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input } from '@angular/core';
+import {
+  AfterContentInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input
+} from '@angular/core';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
 import { IconDirective } from '@coreui/icons-angular';
 import { ColComponent, RowComponent, WidgetStatDComponent } from '@coreui/angular';
 import { ChartData } from 'chart.js';
+import { StatService } from '../../../services/stat.service';
+import { SiteStatsDTO } from '../../../models/SiteStatsDTO';
 
 type BrandData = {
   icon: string
@@ -14,18 +22,17 @@ type BrandData = {
 }
 
 @Component({
-    selector: 'app-widgets-brand',
-    templateUrl: './widgets-brand.component.html',
-    styleUrls: ['./widgets-brand.component.scss'],
-    changeDetection: ChangeDetectionStrategy.Default,
-    imports: [RowComponent, ColComponent, WidgetStatDComponent, IconDirective, ChartjsComponent]
+  selector: 'app-widgets-brand',
+  templateUrl: './widgets-brand.component.html',
+  styleUrls: ['./widgets-brand.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Default,
+  standalone: true,
+  imports: [RowComponent, ColComponent, WidgetStatDComponent, IconDirective, ChartjsComponent]
 })
 export class WidgetsBrandComponent implements AfterContentInit {
-  private changeDetectorRef = inject(ChangeDetectorRef);
 
+  @Input() withCharts: boolean = true;
 
-  readonly withCharts = input<boolean>();
-  // @ts-ignore
   chartOptions = {
     elements: {
       line: {
@@ -53,7 +60,8 @@ export class WidgetsBrandComponent implements AfterContentInit {
       }
     }
   };
-  labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+
+  labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
   datasets = {
     borderWidth: 2,
     fill: true
@@ -64,51 +72,49 @@ export class WidgetsBrandComponent implements AfterContentInit {
     pointHoverBackgroundColor: '#fff',
     pointBackgroundColor: 'rgba(255,255,255,.55)'
   };
-  brandData: BrandData[] = [
-    {
-      icon: 'cibFacebook',
-      values: [{ title: 'friends', value: '89K' }, { title: 'feeds', value: '459' }],
-      capBg: { '--cui-card-cap-bg': '#3b5998' },
-      labels: [...this.labels],
-      data: {
-        labels: [...this.labels],
-        datasets: [{ ...this.datasets, data: [65, 59, 84, 84, 51, 55, 40], label: 'Facebook', ...this.colors }]
-      }
-    },
-    {
-      icon: 'cibTwitter',
-      values: [{ title: 'followers', value: '973k' }, { title: 'tweets', value: '1.792' }],
-      capBg: { '--cui-card-cap-bg': '#00aced' },
-      data: {
-        labels: [...this.labels],
-        datasets: [{ ...this.datasets, data: [1, 13, 9, 17, 34, 41, 38], label: 'Twitter', ...this.colors }]
-      }
-    },
-    {
-      icon: 'cib-linkedin',
-      values: [{ title: 'contacts', value: '500' }, { title: 'feeds', value: '1.292' }],
-      capBg: { '--cui-card-cap-bg': '#4875b4' },
-      data: {
-        labels: [...this.labels],
-        datasets: [{ ...this.datasets, data: [78, 81, 80, 45, 34, 12, 40], label: 'LinkedIn', ...this.colors }]
-      }
-    },
-    {
-      icon: 'cilCalendar',
-      values: [{ title: 'events', value: '12+' }, { title: 'meetings', value: '4' }],
-      capBg: { '--cui-card-cap-bg': 'var(--cui-warning)' },
-      data: {
-        labels: [...this.labels],
-        datasets: [{ ...this.datasets, data: [35, 23, 56, 22, 97, 23, 64], label: 'Events', ...this.colors }]
-      }
-    }
-  ];
 
-  capStyle(value: string) {
-    return !!value ? { '--cui-card-cap-bg': value } : {};
-  }
+  brandData: BrandData[] = [];
+
+  constructor(
+    private statService: StatService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngAfterContentInit(): void {
-    this.changeDetectorRef.detectChanges();
+    this.statService.getStatsBySite().subscribe((sites: SiteStatsDTO[]) => {
+      this.brandData = sites.map((site, index) => ({
+        icon: this.getIconByIndex(index),
+        values: [
+          { title: 'offres', value: site.nombreOffres.toString() },
+          { title: 'candidatures', value: site.nombreCandidatures.toString() }
+        ],
+        capBg: this.getCapBgByIndex(index),
+        labels: [...this.labels],
+        data: {
+          labels: [...this.labels],
+          datasets: [{
+            ...this.datasets,
+            data: this.generateRandomData(),
+            label: site.nomSite,
+            ...this.colors
+          }]
+        }
+      }));
+      this.cdr.detectChanges();
+    });
+  }
+
+  getIconByIndex(index: number): string {
+    const icons = ['cibFacebook', 'cibTwitter', 'cib-linkedin', 'cilCalendar'];
+    return icons[index % icons.length];
+  }
+
+  getCapBgByIndex(index: number): any {
+    const colors = ['#3b5998', '#00aced', '#4875b4', 'var(--cui-warning)'];
+    return { '--cui-card-cap-bg': colors[index % colors.length] };
+  }
+
+  generateRandomData(): number[] {
+    return Array.from({ length: 7 }, () => Math.floor(Math.random() * 100));
   }
 }

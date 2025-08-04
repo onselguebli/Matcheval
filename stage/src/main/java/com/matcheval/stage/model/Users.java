@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -23,11 +24,14 @@ public class Users {
     private Civility civility;
     private String phonenumber;
     private Date createdAt;
+    private LocalDateTime lastLogin;
+
     private boolean locked=false;
     private boolean enabled=true;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Roles role;
+
     @ManyToOne
     @JoinColumn(name = "manager_id")
     @JsonBackReference

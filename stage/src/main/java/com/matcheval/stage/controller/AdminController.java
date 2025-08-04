@@ -1,11 +1,11 @@
 package com.matcheval.stage.controller;
 
+import com.matcheval.stage.dto.MonthlyDashboardDTO;
 import com.matcheval.stage.dto.ReqRes;
 import com.matcheval.stage.interfaces.IUserService;
 import com.matcheval.stage.model.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,22 +58,8 @@ public class AdminController {
         return ResponseEntity.ok(userService.blockUser(userId));
     }
 
-    @GetMapping("/recruteurs-par-manager/{managerId}")
-    public ResponseEntity<List<Users>> getRecruteursParManager(@PathVariable Long managerId) {
-        List<Users> recruteurs = userService.findRecruteursByManagerId(managerId);
-        return ResponseEntity.ok(recruteurs);
-    }
 
-    @GetMapping("/stats/users-by-role")
-    public ResponseEntity<Map<String, Long>> getUserCountByRole() {
-        Map<String, Long> stats = userService.countUsersByRole();
-        return ResponseEntity.ok(stats);
-    }
 
-    @GetMapping("/stats/users-per-year")
-    public ResponseEntity<Map<Integer, Long>> getUsersPerYear() {
-        Map<Integer, Long> stats = userService.countUsersByYear();
-        return ResponseEntity.ok(stats);
-    }
+
 
 }

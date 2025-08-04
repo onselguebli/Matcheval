@@ -1,9 +1,13 @@
 package com.matcheval.stage.service;
 
+import com.matcheval.stage.dto.MonthlyDashboardDTO;
 import com.matcheval.stage.interfaces.IUserService;
 import com.matcheval.stage.dto.ReqRes;
+import com.matcheval.stage.model.Civility;
 import com.matcheval.stage.model.Roles;
 import com.matcheval.stage.model.Users;
+import com.matcheval.stage.repo.CandidatureRepo;
+import com.matcheval.stage.repo.SiteExterneRepo;
 import com.matcheval.stage.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,8 +16,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService {
@@ -21,6 +25,10 @@ public class UserService implements IUserService {
     MailService mailService;
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private CandidatureRepo candidatureRepo;
+    @Autowired
+    private SiteExterneRepo siteExterneRepo;
     @Autowired
     AuthenticationManager authManager;
     @Autowired
@@ -45,6 +53,9 @@ public ReqRes login(ReqRes loginRequest) {
         if (user == null) {
             throw new UsernameNotFoundException("Utilisateur introuvable");
         }
+        user.setLastLogin(LocalDateTime.now());
+        userRepo.save(user);  // Sauvegarde la mise à jour
+
 
         // Générer les tokens
         String token = jwtService.generateToken(user);
@@ -266,37 +277,10 @@ public ReqRes login(ReqRes loginRequest) {
         }
         return reqRes;
     }
-    public List<Users> findRecruteursByManagerId(Long managerId) {
-        return userRepo.findByManagerId(managerId);  // Assure-toi que ce repo existe
-    }
 
-    @Override
-    public Map<String, Long> countUsersByRole() {
-        List<Object[]> results = userRepo.countUsersByRole();
 
-        Map<String, Long> roleCounts = new HashMap<>();
-        for (Object[] row : results) {
-            String role = row[0].toString(); // u.role is an enum
-            Long count = (Long) row[1];
-            roleCounts.put(role, count);
-        }
 
-        return roleCounts;
-    }
 
-    @Override
-    public Map<Integer, Long> countUsersByYear() {
-        List<Object[]> results = userRepo.countUsersByYear();
-
-        Map<Integer, Long> yearCounts = new HashMap<>();
-        for (Object[] row : results) {
-            Integer year = (Integer) row[0];
-            Long count = (Long) row[1];
-            yearCounts.put(year, count);
-        }
-
-        return yearCounts;
-    }
 
 }
 

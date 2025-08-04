@@ -3,10 +3,7 @@ package com.matcheval.stage.service;
 import com.matcheval.stage.dto.CandidatureExterne;
 import com.matcheval.stage.model.*;
 import com.matcheval.stage.interfaces.IOffreService;
-import com.matcheval.stage.repo.CandidatureRepo;
-import com.matcheval.stage.repo.OffreRepo;
-import com.matcheval.stage.repo.SiteExterneRepo;
-import com.matcheval.stage.repo.UserRepo;
+import com.matcheval.stage.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,9 +11,12 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 @Service
 public class OffreService implements IOffreService {
     private final RestTemplate restTemplate = new RestTemplate();
@@ -28,6 +28,8 @@ public class OffreService implements IOffreService {
     private SiteExterneRepo siteRepo;
     @Autowired
     private CandidatureRepo candidatureRepo;
+    @Autowired
+    private OffreSiteExterneRepo offreSiteExterneRepo;
 
     @Override
     public boolean diffuserOffre(OffreEmploi offre, SiteExterne site) {
@@ -66,6 +68,14 @@ public class OffreService implements IOffreService {
         for (SiteExterne site : sites) {
             boolean success = diffuserOffre(savedOffre, site);
             System.out.println("✅ Diffusion vers " + site.getNom() + ": " + (success ? "OK" : "Échec"));
+            OffreSiteExterne ose = new OffreSiteExterne();
+            ose.setOffre(savedOffre);
+            ose.setSiteExterne(site);
+            ose.setDateDiffusion(LocalDateTime.now());
+            ose.setStatutDiffusion(success ? "SUCCES" : "ECHEC");
+
+            offreSiteExterneRepo.save(ose);
+
         }
 
         return savedOffre;
@@ -85,9 +95,17 @@ public class OffreService implements IOffreService {
                 for (CandidatureExterne externe : donnees) {
                     boolean dejaImportee = candidatureRepo.existsByCandidatEmailAndOffreId(externe.getEmail(), offre.getId());
                     if (dejaImportee) continue;
+                    Optional<OffreSiteExterne> optionalOffreSiteExterne = offreSiteExterneRepo.findByOffreAndSiteExterne(offre, site);
+                    if (optionalOffreSiteExterne.isEmpty()) {
+                        System.err.println("❌ Pas de lien OffreSiteExterne trouvé pour " + site.getNom());
+                        continue;
+                    }
+                    OffreSiteExterne offreSiteExterne = optionalOffreSiteExterne.get();
+
 
                     Candidature candidature = new Candidature();
                     candidature.setOffre(offre);
+                    candidature.setSourceSite(offreSiteExterne);
                     candidature.setDateSoumission(LocalDateTime.now());
                     candidature.setStatut("En attente");
                     candidature.setCommentaire(externe.getCommentaire());
@@ -99,7 +117,10 @@ public class OffreService implements IOffreService {
                     CV cv = new CV();
                     cv.setContenuTexte(externe.getCv().getContenuTexte());
                     cv.setFormat(externe.getCv().getFormat());
-                    cv.setDateUpload(String.valueOf(LocalDate.parse(externe.getCv().getDateUpload()))); // conversion date
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    LocalDate localDate = LocalDate.parse(externe.getCv().getDateUpload(), formatter);
+                    cv.setDateUpload(java.sql.Date.valueOf(localDate));
+
                     cv.setCandidature(candidature); // relation inverse
 
                     candidature.setCv(cv);
@@ -113,5 +134,7 @@ public class OffreService implements IOffreService {
             }
         }
     }
+
+
 
 }

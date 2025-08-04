@@ -1,8 +1,8 @@
 package com.matcheval.stage.interfaces;
 
+import com.matcheval.stage.dto.MonthlyDashboardDTO;
 import com.matcheval.stage.dto.ReqRes;
 import com.matcheval.stage.model.Users;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -20,8 +20,5 @@ public interface IUserService {
      ReqRes blockUser(Long userId);
      ReqRes getManagers();
 
-    List<Users> findRecruteursByManagerId(Long managerId);
-     Map<String, Long> countUsersByRole();
 
-    public Map<Integer, Long> countUsersByYear();
 }

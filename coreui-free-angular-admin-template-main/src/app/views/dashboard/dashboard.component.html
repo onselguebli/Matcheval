@@ -1,22 +1,101 @@
 <app-widgets-dropdown />
-<c-card class="my-4 chart-card">
-  <c-card-header class="text-center">👤 Répartition des utilisateurs par rôle</c-card-header>
+<c-row class="justify-content-center gx-4 gy-4 my-4">
+  <!-- Carte utilisateurs actifs -->
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm rounded-4 bg-white text-dark">
+      <div class="card-body d-flex align-items-center">
+        <div class="me-3">
+          <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+            <i class="bi bi-person-check-fill"></i>
+          </div>
+        </div>
+        <div>
+          <h6 class="mb-1 text-muted">Utilisateurs actifs aujourd’hui</h6>
+          <h4 class="mb-0 fw-bold">{{ activeUsersToday }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carte CVs déposés -->
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm rounded-4 bg-white text-dark">
+      <div class="card-body d-flex align-items-center">
+        <div class="me-3">
+          <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+            <i class="bi bi-file-earmark-person-fill"></i>
+          </div>
+        </div>
+        <div>
+          <h6 class="mb-1 text-muted">CVs déposés aujourd’hui</h6>
+          <h4 class="mb-0 fw-bold">{{ totalCVs }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</c-row>
+
+<c-row class="justify-content-center gx-4 gy-4 my-4">
+  <c-col md="6" lg="5" xl="4">
+    <c-card class="chart-card h-100">
+      <c-card-header class="text-center">👤 Répartition des utilisateurs par rôle</c-card-header>
+      <c-card-body>
+        <c-chart
+          type="doughnut"
+          style="max-width: 300px; max-height: 300px; margin: 0 auto"
+          [data]="{
+            labels: userRoles,
+            datasets: [{
+              data: userCounts,
+              backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc']
+            }]
+          }"
+        ></c-chart>
+      </c-card-body>
+    </c-card>
+  </c-col>
+
+  <c-col md="6" lg="5" xl="4">
+    <c-card class="chart-card h-100">
+      <c-card-header class="text-center">⛔/✅ Répartition des comptes activés</c-card-header>
+      <c-card-body>
+        <c-chart
+          type="pie"
+          [height]="300"
+          [data]="{
+            labels: userStatusLabels,
+            datasets: [{
+              data: userStatusCounts,
+              backgroundColor: ['#28a745', '#dc3545']
+            }]
+          }"
+        ></c-chart>
+      </c-card-body>
+    </c-card>
+  </c-col>
+  <c-col md="6" lg="5" xl="4">
+    <c-card class="chart-card h-100">
+  <c-card-header class="text-center">🧑‍🤝‍🧑 Répartition par civilité</c-card-header>
   <c-card-body>
     <c-chart
-      type="doughnut"
-      style="max-width: 300px; max-height: 300px; margin: 0 auto"
+      type="bar"
+      [height]="300"
       [data]="{
-        labels: userRoles,
+        labels: userCivilityLabels,
         datasets: [{
-          data: userCounts,
-          backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc']
+          label: 'Utilisateurs',
+          data: userCivilityCounts,
+          backgroundColor: ['#6f42c1', '#fd7e14',  '#e83e8c']
         }]
       }"
     ></c-chart>
   </c-card-body>
 </c-card>
 
-<c-card class="mt-4">
+  </c-col>
+</c-row>
+
+<c-card class="mt-4 ">
   <c-card-header class="text-center">📅 Utilisateurs par année de création</c-card-header>
   <c-card-body>
     <c-chart
@@ -27,19 +106,42 @@
         datasets: [{
           label: 'Comptes créés',
           data: userCountsPerYear,
-          backgroundColor: '#36b9cc'
+          backgroundColor: ['#36b9cc', '#4e73df', '#1cc88a', '#e74a3b', '#f6c23e', '#5a5c69']
         }]
       }"
     ></c-chart>
   </c-card-body>
 </c-card>
 
+
+<c-card class="mt-4 ">
+  <c-card-header class="text-center">👥 Recruteurs par manager (email)</c-card-header>
+  <c-card-body>
+    <c-chart
+      type="bar"
+      [height]="350"
+      [data]="{
+        labels: recruteurLabels,
+        datasets: [
+          {
+            label: 'Nombre de recruteurs',
+            data: recruteurCounts,
+            backgroundColor:  ['#36b9cc', '#4e73df', '#1cc88a', '#e74a3b', '#f6c23e', '#5a5c69']
+          }
+        ]
+      }"
+      [options]="recruteursChartOptions"
+    ></c-chart>
+  </c-card-body>
+</c-card>
+
+
 <c-card class="my-4">
   <c-card-body>
     <c-row>
       <c-col sm="5">
         <h4 class="card-title mb-0" id="traffic">Traffic</h4>
-        <div class="small text-body-secondary">January - December 2023</div>
+        <div class="small text-body-secondary">January - December 2023/2024/2025</div>
       </c-col>
       <c-col class="d-none d-md-block" sm="7">
         <button cButton class="float-end" color="primary" aria-label="Download">
@@ -55,7 +157,7 @@
               id="dayRadio"
             />
             <label
-              (click)="setTrafficPeriod('Day')"
+              (click)="setTrafficPeriod('day')"
               cButton
               cFormCheckLabel
               color="secondary"
@@ -72,7 +174,7 @@
               id="radioMonth"
             />
             <label
-              (click)="setTrafficPeriod('Month')"
+              (click)="setTrafficPeriod('month')"
               cButton
               cFormCheckLabel
               color="secondary"
@@ -89,7 +191,7 @@
               id="radioYear"
             />
             <label
-              (click)="setTrafficPeriod('Year')"
+              (click)="setTrafficPeriod('year')"
               cButton
               cFormCheckLabel
               color="secondary"
@@ -113,38 +215,81 @@
       Main chart
     </c-chart>
   </c-card-body>
-  <c-card-footer>
-    <c-row class="text-center mb-2" [xl]="5" [lg]="4" [sm]="2" [xs]="1" [gutter]="4">
-      <c-col>
-        <div class="text-body-secondary">Visits</div>
-        <strong>29.703 Users (40%)</strong>
-        <c-progress class="mt-2" thin color="success" value="40" aria-label="User visits" />
-      </c-col>
-      <c-col>
-        <div class="text-body-secondary">Unique</div>
-        <div class="fw-semibold text-truncate">24.093 Users (20%)</div>
-        <c-progress class="mt-2" thin color="info" value="20" aria-label="Unique users" />
-      </c-col>
-      <c-col>
-        <div class="text-body-secondary">Page views</div>
-        <div class="fw-semibold text-truncate">78.706 Views (60%)</div>
-        <c-progress class="mt-2" thin color="warning" value="60" aria-label="Page views" />
-      </c-col>
-      <c-col>
-        <div class="text-body-secondary">New Users</div>
-        <div class="fw-semibold text-truncate">22.123 Users (80%)</div>
-        <c-progress class="mt-2" thin color="danger" value="80" aria-label="New users" />
-      </c-col>
-      <c-col class="d-none d-xl-block">
-        <div class="text-body-secondary">Bounce Rate</div>
-        <div class="fw-semibold text-truncate">Average Rate (40.15%)</div>
-        <c-progress class="mt-2" thin value="40" aria-label="Bounce rate" />
-      </c-col>
-    </c-row>
-  </c-card-footer>
+ <c-card-footer>
+  <c-row class="text-center mb-2" [xl]="3" [lg]="3" [sm]="1" [xs]="1" [gutter]="4">
+    <c-col>
+      <div class="text-body-secondary">CVs déposés</div>
+      <strong>{{ totalCVs }} CVs</strong>
+      <c-progress class="mt-2" thin color="primary" [value]="(totalCVs * 100) / (totalCVs + totalOffres + totalRecruteurs)" aria-label="CVs" />
+    </c-col>
+    <c-col>
+      <div class="text-body-secondary">Offres publiées</div>
+      <strong>{{ totalOffres }} Offres</strong>
+      <c-progress class="mt-2" thin color="success" [value]="(totalOffres * 100) / (totalCVs + totalOffres + totalRecruteurs)" aria-label="Offres" />
+    </c-col>
+    <c-col>
+      <div class="text-body-secondary">Recruteurs actifs</div>
+      <strong>{{ totalRecruteurs }} Recruteurs</strong>
+      <c-progress class="mt-2" thin color="warning" [value]="(totalRecruteurs * 100) / (totalCVs + totalOffres + totalRecruteurs)" aria-label="Recruteurs" />
+    </c-col>
+  </c-row>
+</c-card-footer>
+
 </c-card>
 
 <app-widgets-brand [withCharts]="true" />
+
+
+ <c-card class="mt-4 shadow-sm border-0 rounded-4">
+  <c-card-header class="bg-gradient text-white fw-semibold d-flex align-items-center justify-content-between" style="background: #36b9cc;">
+    <div>
+      <svg cIcon name="cil-people" class="me-2"></svg>
+      Nombre d’offres d’emploi par recruteur
+    </div>
+    <input
+      type="text"
+      class="form-control form-control-sm w-auto"
+      placeholder="🔍 Filtrer par email"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="filterStats()"
+    />
+  </c-card-header>
+
+  <c-card-body class="p-0">
+    <div class="table-responsive">
+      <table class="table table-hover text-center mb-0 table-bordered">
+        <thead class="bg-light text-uppercase small fw-semibold text-dark">
+          <tr>
+            <th class="py-3 border-end">👤 Email du Recruteur</th>
+            <th class="py-3">📌 Nombre d’offres</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let stat of paginatedStats"
+              [ngClass]="{
+                'bg-success bg-opacity-10 fw-bold text-success': stat.nombreOffres === maxOffres,
+                'fw-semibold': stat.nombreOffres !== maxOffres
+              }">
+            <td class="py-3 border-end text-start ps-4">{{ stat.recruteurEmail }}</td>
+            <td class="py-3">{{ stat.nombreOffres }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 📄 Pagination Globale Réutilisable -->
+    <div class="pt-3"> <!-- ✅ Ajout d'un padding top -->
+  <app-pagination-1
+    [currentPage]="currentPage"
+    [totalItems]="filteredStats.length"
+    [itemsPerPage]="itemsPerPage"
+    (pageChanged)="onPageChanged($event)">
+  </app-pagination-1>
+</div>
+  </c-card-body>
+</c-card>
+
+
 
 <c-row class="mt-4">
   <c-col xs>

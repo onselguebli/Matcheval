@@ -25,5 +25,7 @@ public class Candidature {
     private OffreEmploi offre;
     @OneToOne(mappedBy = "candidature", cascade = CascadeType.ALL)
     private CV cv;
+    @ManyToOne
+    private OffreSiteExterne sourceSite;
 
 }

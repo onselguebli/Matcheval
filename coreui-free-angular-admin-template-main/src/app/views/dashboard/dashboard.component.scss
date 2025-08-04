@@ -22,3 +22,28 @@
   font-weight: 600;
   font-size: 0.95rem;
 }
+.table tbody tr:hover {
+  background-color: #f1f1f1;
+  transition: background-color 0.2s ease-in-out;
+}
+
+
+.custom-colored-table tbody tr.top-row-1 {
+  background-color: rgba(54, 185, 204, 0.3);
+  font-weight: 900;
+}
+
+.custom-colored-table tbody tr.top-row-2 {
+  background-color: rgba(54, 185, 204, 0.2);
+  font-weight: 700;
+}
+
+.custom-colored-table tbody tr.top-row-3 {
+  background-color: rgba(54, 185, 204, 0.1);
+  font-weight: 600;
+}
+
+/* Pour préserver le survol (hover) */
+.custom-colored-table.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.075); /* Couleur hover par défaut de Bootstrap */
+}

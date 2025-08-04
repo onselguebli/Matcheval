@@ -19,10 +19,10 @@ export class Pagination1Component {
   }
 
   changePage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.pageChanged.emit(page);
-    }
+  if (page >= 1 && page <= this.totalPages) {
+    this.pageChanged.emit(page); // ✅ emits a number
   }
+}
 
   pages(): number[] {
     return Array(this.totalPages).fill(0).map((_, i) => i + 1);

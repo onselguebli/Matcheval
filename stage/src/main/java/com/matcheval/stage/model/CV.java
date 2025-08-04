@@ -3,6 +3,8 @@ package com.matcheval.stage.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Date;
+
 @Entity
 @Data
 public class CV {
@@ -12,7 +14,7 @@ public class CV {
     private  String file;
     private String contenuTexte;
     private String format;
-    private String dateUpload;
+    private Date dateUpload;
     @OneToOne
     @JoinColumn(name = "candidature_id")
     private Candidature candidature;

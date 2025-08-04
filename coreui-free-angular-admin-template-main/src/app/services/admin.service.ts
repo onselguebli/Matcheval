@@ -83,26 +83,11 @@ block(id: number): Observable<{ user: User }> {
 
   return this.http.post<{ user: User }>(
     `${this.BASE_URL}/admin/block/${id}`,
-    {}, // 👈 body vide (correct ici)
-    { headers } // 👈 headers doivent être passés dans options, pas dans le body
+    {},
+    { headers }
   );
 }
 
-getUserStatsByRole(): Observable<any> {
-  const token = this.authService.getToken();
-  const headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  });
-  return this.http.get<Map<string, number>>(`${this.BASE_URL}/admin/stats/users-by-role`, { headers });
-}
-getUsersPerYear(): Observable<any> {
-  const token = this.authService.getToken();
-  const headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  });
-  return this.http.get<Map<number, number>>(`${this.BASE_URL}/admin/stats/users-per-year`, { headers });
-}
+
 
 }

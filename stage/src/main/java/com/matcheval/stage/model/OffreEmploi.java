@@ -3,6 +3,7 @@ package com.matcheval.stage.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 @Data
@@ -28,5 +29,5 @@ public class OffreEmploi {
     private List<Candidature> candidatures;
 
     @OneToMany(mappedBy = "offre")
-    private List<OffreSiteExterne> offresExternes;
+    private List<OffreSiteExterne> offresExternes = new ArrayList<>();
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+//extraire les candidature externe
 public class CandidatureExterne {
     private String nom;
     private String prenom;
