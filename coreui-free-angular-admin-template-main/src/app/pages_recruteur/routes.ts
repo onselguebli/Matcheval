@@ -14,6 +14,20 @@ export const routes: Routes = [
           title: 'post_offre' 
         }
       },
+      {
+        path: 'liste-candidatures',
+        loadComponent: () => import('./liste-candidatures/liste-candidatures.component').then(m => m.ListeCandidaturesComponent),
+        data: {
+          title: 'liste-candidatures' 
+        }
+      },
+      {
+        path: 'liste-offre',
+        loadComponent: () => import('./list-offre/list-offre.component').then(m => m.ListOffreComponent),
+        data: {
+          title: 'liste-offres' 
+        }
+      },
     ]
   }
 ];

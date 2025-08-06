@@ -31,7 +31,23 @@
                [(ngModel)]="offre.exigences" name="exigences">
       </div>
     </fieldset>
-
+<!-- Type d'offre -->
+<fieldset class="mb-4">
+  <legend><i class="me-2"></i>Type d'offre *</legend>
+  <select class="form-select"
+          [(ngModel)]="offre.typeOffre" name="typeOffre" required #typeOffre="ngModel">
+    <option [ngValue]="''" disabled>Choisir le type</option>
+    <option value="IT">IT</option>
+    <option value="BUSINESS">Business</option>
+    <option value="MARKETING">Marketing</option>
+    <option value="FINANCE">Finance</option>
+    <option value="RH">Ressources Humaines</option>
+    <option value="AUTRE">Autre</option>
+  </select>
+  <div *ngIf="typeOffre.invalid && typeOffre.touched" class="text-danger mt-1">
+    Type d'offre requis
+  </div>
+</fieldset>
     <!-- Localisation -->
     <fieldset class="mb-3">
       <legend><i class="me-2"></i>Localisation</legend>
@@ -74,7 +90,7 @@
       <legend><i class="me-2"></i>Statut *</legend>
       <select class="form-select"
               [(ngModel)]="offre.statut" name="statut" required #statut="ngModel">
-        <option [ngValue]="null" disabled selected>Choisir la statut</option>
+        <option [ngValue]="''" disabled>Choisir la statut</option>
         <option value="active">Active</option>
         <option value="inactive">Inactive</option>
       </select>

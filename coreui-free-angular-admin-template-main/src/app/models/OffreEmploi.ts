@@ -6,5 +6,6 @@ export interface OffreEmploi {
   dateExpiration: string; 
   datePublication: string; 
   statut: string;
+  typeOffre?: string; 
   localisation?: string;
 }

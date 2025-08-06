@@ -34,4 +34,6 @@ FROM SiteExterne s
 """)
 
     List<SiteStatsDTO> getStatsBySite();
+
+    List<OffreSiteExterne> findByOffre(OffreEmploi saved);
 }

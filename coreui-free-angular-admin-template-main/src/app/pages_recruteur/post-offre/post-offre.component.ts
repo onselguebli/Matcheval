@@ -19,7 +19,8 @@ export class PostOffreComponent {
    localisation: '',
    exigences: '',
    dateExpiration: '',
-   datePublication:'', 
+    typeOffre: '',
+    datePublication:'', 
     statut: ''
 
  };

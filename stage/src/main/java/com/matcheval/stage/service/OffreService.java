@@ -1,6 +1,7 @@
 package com.matcheval.stage.service;
 
 import com.matcheval.stage.dto.CandidatureExterne;
+import com.matcheval.stage.dto.OffreWithCandidaturesDTO;
 import com.matcheval.stage.model.*;
 import com.matcheval.stage.interfaces.IOffreService;
 import com.matcheval.stage.repo.*;
@@ -41,6 +42,7 @@ public class OffreService implements IOffreService {
                     "localisation", offre.getLocalisation(),
                     "date de publication",offre.getDatePublication(),
                     "date d expiration",offre.getDateExpiration(),
+                    "type d offre",offre.getTypeOffre().name(),
                     "satut",offre.getStatut()
 
             );
@@ -135,6 +137,62 @@ public class OffreService implements IOffreService {
         }
     }
 
+    public ResponseEntity<List<OffreWithCandidaturesDTO>> getOffresWithCandidatures( String recruteurEmail) {
+        List<OffreEmploi> offres = offreRepository.findOffresWithCandidaturesByRecruteur(recruteurEmail);
+
+        List<OffreWithCandidaturesDTO> dtoList = offres.stream().map(offre -> {
+            List<OffreWithCandidaturesDTO.CandidatureDTO> candidatures = offre.getCandidatures()
+                    .stream()
+                    .map(c -> new OffreWithCandidaturesDTO.CandidatureDTO(
+                            c.getId(),
+                            c.getCandidatNom(),
+                            c.getCandidatPrenom(),
+                            c.getDateSoumission()))
+                    .toList();
+
+            return new OffreWithCandidaturesDTO(
+                    offre.getId(),
+                    offre.getTitre(),
+                    candidatures);
+        }).toList();
+
+        return ResponseEntity.ok(dtoList);
+    }
+
+    @Override
+    public OffreEmploi modifierOffreEtSynchroniser(Long id, OffreEmploi updatedData) {
+        OffreEmploi offre = offreRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Offre non trouvée"));
+
+        // ✅ Mise à jour des champs locaux
+        if (updatedData.getTitre() != null) offre.setTitre(updatedData.getTitre());
+        if (updatedData.getDescription() != null) offre.setDescription(updatedData.getDescription());
+        if (updatedData.getExigences() != null) offre.setExigences(updatedData.getExigences());
+        if (updatedData.getDateExpiration() != null) offre.setDateExpiration(updatedData.getDateExpiration());
+        if (updatedData.getStatut() != null) offre.setStatut(updatedData.getStatut());
+        if (updatedData.getLocalisation() != null) offre.setLocalisation(updatedData.getLocalisation());
+        if (updatedData.getTypeOffre() != null) offre.setTypeOffre(updatedData.getTypeOffre());
+
+        OffreEmploi saved = offreRepository.save(offre);
+
+        // 🔄 Synchronisation sur les sites externes déjà liés
+        List<OffreSiteExterne> liens = offreSiteExterneRepo.findByOffre(saved);
+
+        for (OffreSiteExterne ose : liens) {
+            SiteExterne site = ose.getSiteExterne();
+            boolean success = diffuserOffre(saved, site);
+            ose.setStatutDiffusion(success ? "SUCCES" : "ECHEC");
+            ose.setDateDiffusion(LocalDateTime.now());
+            offreSiteExterneRepo.save(ose);
+        }
+
+        return saved;
+    }
+
+    @Override
+    public List<OffreEmploi> getOffresByRecruteurEmail(String email) {
+        return offreRepository.findByRecruteurEmail(email);
+    }
 
 
 }

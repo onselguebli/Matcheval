@@ -5,10 +5,7 @@ export const navItemsRecruiter: INavData[] = [
     name: 'Accueil Recruteur',
     url: '/dashboard',
     iconComponent: { name: 'cil-speedometer' },
-    badge: {
-      color: 'info',
-      text: 'NEW'
-    }
+   
   },
   {
     title: true,
@@ -18,6 +15,16 @@ export const navItemsRecruiter: INavData[] = [
     name: 'post_offre',
     url: '/recruiter-dashboard/pages_recruteur/post_offre',
    iconComponent: { name: 'cil-user-follow' }
+  },
+  {
+    name: 'liste_candidatures',
+    url: '/recruiter-dashboard/pages_recruteur/liste-candidatures',
+   iconComponent: { name: 'cil-list' }
+  },
+  {
+    name: 'liste_offres',
+    url: '/recruiter-dashboard/pages_recruteur/liste-offre',
+   iconComponent: { name: 'cil-list-rich' }
   },
   {
     name: 'Colors',

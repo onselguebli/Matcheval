@@ -17,17 +17,6 @@ public interface CandidatureRepo extends JpaRepository<Candidature,Long> {
             "GROUP BY EXTRACT(MONTH FROM c.dateSoumission)")
     List<Object[]> countCandidaturesByMonth();
 
-    @Query("""
-    SELECT new com.matcheval.stage.dto.SiteStatsDTO(
-        s.id, s.nom, COUNT(DISTINCT ose.offre.id), COUNT(c.id)
-    )
-    FROM OffreSiteExterne ose
-    JOIN ose.siteExterne s
-    LEFT JOIN ose.offre o
-    LEFT JOIN o.candidatures c
-    GROUP BY s.id, s.nom
-""")
-    long countBySourceSiteIn(List<OffreSiteExterne> offresExternes);
 
 
 

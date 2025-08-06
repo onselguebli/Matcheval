@@ -28,6 +28,15 @@ export class AuthService {
     }
     return null;
   }
+getRecruteurEmail(): string | null {
+  const token = this.getToken();
+  if (token) {
+    const decoded = jwtDecode<DecodedToken>(token);
+    return decoded.sub ?? null;  // supposition : sub = email
+  }
+  return null;
+}
+
 
   // Get role without prefix for frontend logic
   getUserRole(): string | null {

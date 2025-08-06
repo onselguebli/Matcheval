@@ -43,7 +43,7 @@ export class WidgetsDropdownComponent implements OnInit {
 
   ngOnInit(): void {
     this.statService.getMonthlyStats().subscribe(data => {
-      console.log('Données récupérées du backend', data);
+      
       this.stats[0].data = data.totalUsers;
       this.stats[1].data = data.totalRecruteurs;
       this.stats[2].data = data.totalManagers;

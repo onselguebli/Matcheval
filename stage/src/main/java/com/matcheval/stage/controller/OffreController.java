@@ -40,8 +40,19 @@ public class OffreController {
         offreService.extraireCandidaturesDepuisSitesExternes(offre);
         return ResponseEntity.ok("Importation des candidatures lancée pour l'offre ID " + offreId);
     }
+    @PutMapping("/offre/{id}")
+    public ResponseEntity<OffreEmploi> modifierOffre(
+            @PathVariable Long id,
+            @RequestBody OffreEmploi dto) {
+        OffreEmploi updated = offreService.modifierOffreEtSynchroniser(id, dto);
+        return ResponseEntity.ok(updated);
+    }
 
-
+    @GetMapping("/offresByrecruteur/{email}")
+    public ResponseEntity<List<OffreEmploi>> getOffresByRecruteurEmail(@PathVariable String email) {
+            List<OffreEmploi> offres = offreService.getOffresByRecruteurEmail(email);
+            return ResponseEntity.ok(offres);
+    }
 
 }
 

@@ -1,0 +1,49 @@
+<div class="container mt-5">
+  <h4 class="mb-3">✍️ Mes offres à modifier</h4>
+
+  <div *ngFor="let offre of offresRecruteur" class="card mb-3 shadow-sm border-0">
+    <div class="card-body">
+      <h5 class="card-title">{{ offre.titre }}</h5>
+      <p class="card-text text-muted">{{ offre.description }}</p>
+      <button class="btn btn-outline-primary btn-sm" (click)="editOffre(offre)">
+        Modifier
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de modification -->
+  <div *ngIf="selectedOffre" class="modal-wrapper">
+    <div class="modal-backdrop" (click)="cancelEdit()"></div>
+    <div class="modal-content card p-4">
+      <h5 class="mb-3">Modifier l'offre</h5>
+
+      <div class="mb-3">
+        <label class="form-label">Titre</label>
+        <input [(ngModel)]="selectedOffre.titre" class="form-control" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea [(ngModel)]="selectedOffre.description" class="form-control"></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Localisation</label>
+        <input [(ngModel)]="selectedOffre.localisation" class="form-control" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Statut</label>
+        <select [(ngModel)]="selectedOffre.statut" class="form-select">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-success" (click)="saveOffre()">💾 Sauvegarder</button>
+        <button class="btn btn-secondary" (click)="cancelEdit()">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>

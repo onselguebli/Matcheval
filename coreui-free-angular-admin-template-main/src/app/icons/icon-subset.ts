@@ -1,6 +1,7 @@
 import {
   cibCcAmex,
   cilWarning,
+  cilListRich,
   cilLockUnlocked,
   cilXCircle,
   cibCcApplePay,
@@ -114,6 +115,7 @@ export const iconSubset = {
   cilLockUnlocked,
   cibCcApplePay,
   cilContact,
+  cilListRich,
   cibCcMastercard,
   cibCcPaypal,
   cibCcStripe,
@@ -216,6 +218,7 @@ export const iconSubset = {
 };
 
 export enum IconSubset {
+  cilListRich='cilListRich',
   cilWarning = 'cilWarning',
   cilXCircle = 'cilXCircle',
   cilCheckCircle = 'cilCheckCircle',

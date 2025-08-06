@@ -21,6 +21,8 @@ public class OffreEmploi {
     private Date dateExpiration;
     private String statut;
     private String localisation;
+    @Enumerated(EnumType.STRING)
+    private TypeOffre typeOffre;
 
     @ManyToOne
     private Users recruteur;

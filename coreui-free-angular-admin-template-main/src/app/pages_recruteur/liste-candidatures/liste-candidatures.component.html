@@ -1,0 +1,54 @@
+<div class="container my-5">
+  <h3 class="mb-4 text-center">📋 Mes offres et candidatures</h3>
+
+  <div *ngFor="let offre of offres" class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-secondary text-white fw-semibold">
+      {{ offre.titre }}
+    </div>
+    <div class="card-body">
+      <h6 class="fw-bold text-muted mb-2">👤 Candidatures :</h6>
+
+      <ul *ngIf="offre.candidatures?.length > 0; else noCandidats" class="list-group">
+        <li *ngFor="let c of offre.candidatures" class="list-group-item d-flex justify-content-between align-items-center">
+          <span class="text-dark fw-medium" (click)="showDetails(c.id)" style="cursor: pointer;">
+            {{ c.candidatPrenom }} {{ c.candidatNom }}
+          </span>
+          <small class="text-muted">{{ c.dateSoumission | date: 'short' }}</small>
+        </li>
+      </ul>
+
+      <ng-template #noCandidats>
+        <p class="text-muted fst-italic">Aucune candidature pour cette offre.</p>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+<!-- Modal personnalisé -->
+<div *ngIf="selectedCandidature" class="modal-wrapper">
+  <div class="modal-backdrop" (click)="closeDetails()"></div>
+  <div class="modal-content card shadow-lg p-4">
+
+    <h5 class="mb-3 text-center">📝 Détails de la candidature</h5>
+
+    <p><strong>👤 Nom :</strong> {{ selectedCandidature.candidatPrenom }} {{ selectedCandidature.candidatNom }}</p>
+    <p><strong>📧 Email :</strong> {{ selectedCandidature.candidatEmail }}</p>
+    <p><strong>💬 Commentaire :</strong> {{ selectedCandidature.commentaire }}</p>
+    <p><strong>🏷️ Offre :</strong> {{ selectedCandidature.titreOffre }}</p>
+
+    <div class="mb-3">
+      <label for="statutSelect" class="form-label fw-semibold">🛠️ Statut :</label>
+      <select id="statutSelect" [(ngModel)]="selectedCandidature.statut" class="form-select">
+        <option disabled selected>Choisir le statut</option>
+        <option value="En attente">⏳ En attente</option>
+        <option value="Acceptée">✅ Acceptée</option>
+        <option value="Refusée">❌ Refusée</option>
+      </select>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+      <button class="btn btn-success" (click)="updateStatut()">💾 Mettre à jour</button>
+      <button class="btn btn-outline-secondary" (click)="closeDetails()">Fermer</button>
+    </div>
+  </div>
+</div>
