@@ -1,5 +1,6 @@
 package com.matcheval.stage.controller;
 
+import com.matcheval.stage.dto.OffreEmploiDTO;
 import com.matcheval.stage.model.OffreEmploi;
 import com.matcheval.stage.model.Users;
 import com.matcheval.stage.repo.OffreRepo;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("recruiter")
@@ -40,19 +42,18 @@ public class OffreController {
         offreService.extraireCandidaturesDepuisSitesExternes(offre);
         return ResponseEntity.ok("Importation des candidatures lancée pour l'offre ID " + offreId);
     }
+    @GetMapping("/offresByrecruteur/{email}")
+    public ResponseEntity<List<OffreEmploiDTO>> getOffresByRecruteurEmail(@PathVariable String email) {
+        List<OffreEmploiDTO> offres = offreService.getOffresByRecruteurEmail(email);
+        return ResponseEntity.ok(offres);
+    }
+
     @PutMapping("/offre/{id}")
-    public ResponseEntity<OffreEmploi> modifierOffre(
-            @PathVariable Long id,
-            @RequestBody OffreEmploi dto) {
-        OffreEmploi updated = offreService.modifierOffreEtSynchroniser(id, dto);
+    public ResponseEntity<OffreEmploiDTO> modifierOffre(@PathVariable Long id, @RequestBody OffreEmploiDTO dto) {
+        OffreEmploiDTO updated = offreService.modifierOffreEtSynchroniser(id, dto);
         return ResponseEntity.ok(updated);
     }
 
-    @GetMapping("/offresByrecruteur/{email}")
-    public ResponseEntity<List<OffreEmploi>> getOffresByRecruteurEmail(@PathVariable String email) {
-            List<OffreEmploi> offres = offreService.getOffresByRecruteurEmail(email);
-            return ResponseEntity.ok(offres);
-    }
 
 }
 

@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-listusers',
-  imports: [TableDirective, CommonModule, UpdateuserComponent, Pagination1Component, FormsModule],
+  imports: [ CommonModule, UpdateuserComponent, Pagination1Component, FormsModule],
   templateUrl: './listusers.component.html',
   styleUrl: './listusers.component.scss'
 })
@@ -48,6 +48,7 @@ loadUsers(): void {
       this.filteredUsers = this.users;
       this.usersByRole = this.getUsersByRole();
       this.roles = Object.keys(this.usersByRole);
+       this.rebuildGroups();  
     },
     error: err => console.error('Erreur chargement utilisateurs', err)
   });
@@ -71,11 +72,17 @@ get paginatedUsers(): User[] {
   return list.slice(start, start + this.itemsPerPage);
 }
 filterUsers(): void {
-  const search = this.searchEmail.toLowerCase();
-  this.filteredUsers = this.users.filter(user =>
-    user.email?.toLowerCase().includes(search)
+  const q = this.searchEmail.trim().toLowerCase();
+
+  this.filteredUsers = !q ? [...this.users] : this.users.filter(u =>
+    (u.email ?? '').toLowerCase().includes(q) ||
+    (u.firstname ?? '').toLowerCase().includes(q) ||
+    (u.lastname ?? '').toLowerCase().includes(q)
   );
-  this.currentPage = 1; // revenir à la première page si on filtre
+
+  this.currentPage = 1;
+  this.selectedManagerId = null;           // évite d’afficher un sous-tableau obsolète
+  this.rebuildGroups();                    // 👈
 }
 
 onPageChange(page: number): void {
@@ -110,5 +117,31 @@ getUsersByRole(): { [role: string]: User[] } {
     return acc;
   }, {} as { [role: string]: User[] });
 }
+
+roleClass(role: string): string {
+  switch ((role || '').toUpperCase()) {
+    case 'ADMIN': return 'admin';
+    case 'MANAGER': return 'manager';
+    case 'RECRUITER': return 'recruiter';
+    default: return '';
+  }
+}
+
+roleIcon(role: string): string {
+  switch ((role || '').toUpperCase()) {
+    case 'ADMIN': return 'bi bi-shield-lock';
+    case 'MANAGER': return 'bi bi-kanban';
+    case 'RECRUITER': return 'bi bi-person-badge';
+    default: return 'bi bi-people';
+  }
+}
+private rebuildGroups(): void {
+  this.usersByRole = this.getUsersByRole();
+  // (optionnel) ordre fixe des rôles
+  const order = ['ADMIN', 'MANAGER', 'RECRUITER'];
+  this.roles = Object.keys(this.usersByRole)
+    .sort((a, b) => order.indexOf(a) - order.indexOf(b));
+}
+
 
 }

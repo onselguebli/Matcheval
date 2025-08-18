@@ -1,86 +1,125 @@
 <!-- Filtres -->
-<div class="mb-3">
-  <input
-    type="text"
-    class="form-control"
-    placeholder="Filtrer par email"
-    [(ngModel)]="searchEmail"
-    (input)="filterUsers()" />
+<div class="toolbar">
+  <div class="search-pill">
+    <i class="bi bi-search"></i>
+    <input
+      type="text"
+      placeholder="Filtrer par email"
+      [(ngModel)]="searchEmail"
+      (input)="filterUsers()" />
+    <button *ngIf="searchEmail" class="clear" (click)="searchEmail=''; filterUsers()">
+      <i class="bi bi-x-circle"></i>
+    </button>
+  </div>
 </div>
 
-<!-- Boucle sur chaque rôle -->
+<!-- Sections par rôle -->
 <ng-container *ngFor="let role of roles">
-  <h5 class="mt-4 mb-2">{{ role }}</h5>
+  <div class="role-card">
+    <div class="role-header" [ngClass]="roleClass(role)">
+      <div class="title">
+        <i [class]="roleIcon(role)"></i>
+        <span>{{ role }}</span>
+      </div>
+      <div class="meta">
+        <span class="count-chip">{{ usersByRole[role].length || 0 }} utilisateur(s)</span>
+      </div>
+    </div>
 
-  <table cTable hover striped>
-    <thead>
-      <tr>
-        <th>Prénom</th>
-        <th>Nom</th>
-        <th>Email</th>
-        <th>Date de naissance</th>
-        <th>Role</th>
-        <th>Civilité</th>
-        <th>Téléphone</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let user of usersByRole[role]">
-        <tr (click)="user.role === 'MANAGER' ? showRecruteurs(user.id) : null">
-          <td>{{ user.firstname }}</td>
-          <td>{{ user.lastname }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.dnaiss | date: 'dd/MM/yyyy' }}</td>
-          <td>{{ user.role }}</td>
-          <td>{{ user.civility }}</td>
-          <td>{{ user.phonenumber }}</td>
-          <td>
-            <button
-              class="btn btn-sm px-3 py-1 fw-semibold shadow-sm border-0 transition-all"
-              [ngClass]="user.enabled ? 'btn-status-active' : 'btn-status-inactive'"
-              (click)="toggleActivation(user); $event.stopPropagation()">
-              {{ user.enabled ? 'Activer' : 'Désactiver' }}
-            </button>
-          </td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary fw-semibold px-3 py-1 shadow-sm transition-all"
-              (click)="showUpdateForm(user.id); $event.stopPropagation()">
-              Modifier
-            </button>
-          </td>
-        </tr>
+    <div class="card-body">
+      <table class="nice-table">
+        <thead>
+          <tr>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Date de naissance</th>
+            <th>Rôle</th>
+            <th>Civilité</th>
+            <th>Téléphone</th>
+            <th>Status</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
 
-        <!-- Tableau imbriqué pour les managers -->
-        <tr *ngIf="selectedManagerId === user.id && recruteursOfManager.length > 0">
-          <td colspan="9">
-            <div class="embedded-title">👥 Recruteurs associés</div>
-            <table class="embedded-table">
-              <thead>
-                <tr>
-                  <th>Prénom</th>
-                  <th>Nom</th>
-                  <th>Email</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let recruteur of recruteursOfManager">
-                  <td>{{ recruteur.firstname }}</td>
-                  <td>{{ recruteur.lastname }}</td>
-                  <td>{{ recruteur.email }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-      </ng-container>
-    </tbody>
-  </table>
+        <tbody>
+          <ng-container *ngFor="let user of usersByRole[role]">
+            <!-- ligne principale -->
+            <tr class="row-hover"
+                (click)="user.role === 'MANAGER' ? showRecruteurs(user.id) : null">
+              <td class="fw-600">{{ user.firstname }}</td>
+              <td>{{ user.lastname }}</td>
+              <td class="mono">{{ user.email }}</td>
+              <td>{{ user.dnaiss | date: 'dd/MM/yyyy' }}</td>
+              <td>
+                <span class="role-chip" [ngClass]="roleClass(user.role)">
+                  {{ user.role }}
+                </span>
+              </td>
+              <td>{{ user.civility }}</td>
+              <td class="mono">{{ user.phonenumber }}</td>
+              <td>
+                <span class="status-badge" [class.active]="user.enabled" [class.inactive]="!user.enabled">
+                  {{ user.enabled ? 'Actif' : 'Inactif' }}
+                </span>
+              </td>
+              <td class="actions">
+                <button class="btn-ghost"
+                        [class.danger]="user.enabled"
+                        (click)="toggleActivation(user); $event.stopPropagation()">
+                  <i class="bi" [ngClass]="user.enabled ? 'bi-person-dash' : 'bi-person-check'"></i>
+                  {{ user.enabled ? 'Désactiver' : 'Activer' }}
+                </button>
+                <button class="btn-ghost primary"
+                        (click)="showUpdateForm(user.id); $event.stopPropagation()">
+                  <i class="bi bi-pencil-square"></i>
+                  Modifier
+                </button>
+                <button *ngIf='user.role === "MANAGER"' class="btn-icon"
+                        [class.expanded]="selectedManagerId === user.id"
+                        title="Afficher les recruteurs"
+                        (click)="showRecruteurs(user.id); $event.stopPropagation()">
+                  <i class="bi" [ngClass]="selectedManagerId === user.id ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                </button>
+              </td>
+            </tr>
+
+            <!-- sous-table pour MANAGER -->
+            <tr *ngIf="selectedManagerId === user.id && recruteursOfManager.length > 0" class="subrow">
+              <td colspan="9">
+                <div class="subcard">
+                  <div class="subcard-title">
+                    <i class="bi bi-people"></i>
+                    Recruteurs associés
+                  </div>
+                  <table class="embedded-table">
+                    <thead>
+                      <tr>
+                        <th>Prénom</th>
+                        <th>Nom</th>
+                        <th>Email</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let r of recruteursOfManager">
+                        <td>{{ r.firstname }}</td>
+                        <td>{{ r.lastname }}</td>
+                        <td class="mono">{{ r.email }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </ng-container>
 
 <!-- Pagination -->
-<div>
+<div class="pagination-wrap">
   <app-pagination-1
     [currentPage]="currentPage"
     [totalItems]="users.length"
@@ -89,12 +128,10 @@
   </app-pagination-1>
 </div>
 
-<!-- Formulaire de mise à jour utilisateur (modale) -->
+<!-- Modale -->
 <div *ngIf="selectedUserId" class="modal-wrapper">
   <div class="modal-backdrop" (click)="closeUpdateForm()"></div>
   <div class="modal-content">
-    <app-updateuser
-      [userId]="selectedUserId"
-      (formClosed)="handleFormClosed($event)" />
+    <app-updateuser [userId]="selectedUserId" (formClosed)="handleFormClosed($event)"></app-updateuser>
   </div>
 </div>

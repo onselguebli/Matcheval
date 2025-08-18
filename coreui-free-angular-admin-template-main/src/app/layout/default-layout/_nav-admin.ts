@@ -29,26 +29,13 @@ export const navItemsAdmin: INavData[] = [
     url: '/admin-dashboard/pages_admin/listusers',
    iconComponent: { name: 'cil-list' }
   },
-  {
-    name: 'Typography',
-    url: '/admin-dashboard/theme/typography',
-    linkProps: { fragment: 'headings' },
-    iconComponent: { name: 'cil-pencil' }
-  },
+  
   {
     name: 'Components',
     title: true
   },
   
-  {
-    name: 'Widgets',
-    url: '/admin-dashboard/widgets',
-    iconComponent: { name: 'cil-calculator' },
-    badge: {
-      color: 'info',
-      text: 'NEW'
-    }
-  },
+  
   {
     title: true,
     name: 'Extras'

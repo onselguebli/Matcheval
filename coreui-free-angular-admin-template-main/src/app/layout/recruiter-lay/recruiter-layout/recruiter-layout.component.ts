@@ -6,7 +6,7 @@ import { NgScrollbar } from 'ngx-scrollbar';
 import { DefaultFooterComponent } from '../../default-layout/default-footer/default-footer.component';
 import { DefaultHeaderComponent } from '../../default-layout/default-header/default-header.component';
 import { navItems } from '../../default-layout/_nav';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-recruiter-layout',

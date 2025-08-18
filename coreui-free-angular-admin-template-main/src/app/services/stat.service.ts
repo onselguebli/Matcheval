@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TrafficDashboardDTO } from '../models/TrafficDashboar';
 import { SiteStatsDTO } from '../models/SiteStatsDTO';
+import { SiteTypeCount } from '../models/SiteTypeCount';
 
 @Injectable({
   providedIn: 'root'
@@ -94,8 +95,40 @@ getOffresParRecruteur(): Observable<any[]> {
 }
 getStatsBySite() {
   const headers = new HttpHeaders({ 'Authorization': `Bearer ${this.authService.getToken()}` });
-  return this.http.get<SiteStatsDTO[]>('http://localhost:8080/admin/stats/offre+candi-perSite', { headers });
+  return this.http.get<SiteStatsDTO[]>(`${this.BASE_URL}/admin/stats/offre+candi-perSite`, { headers });
+}
+getOffresByType() {
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${this.authService.getToken()}` });
+  return this.http.get<{ [key: string]: number }>(`${this.BASE_URL}/admin/stats/offres-by-type`, { headers });
 }
 
+  getCandsBySiteTypeGlobal(): Observable<SiteTypeCount[]> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.authService.getToken()}`
+    });
+    return this.http.get<SiteTypeCount[]>(
+      `${this.BASE_URL}/admin/stats/candidatures-par-site-type`,
+      { headers }
+    );
+  }
 
+  getCandsBySiteTypeForRecruteur(email: string): Observable<SiteTypeCount[]> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.authService.getToken()}`
+    });
+    return this.http.get<SiteTypeCount[]>(
+      `${this.BASE_URL}/admin/stats/candidatures-par-site-type/recruteur/${encodeURIComponent(email)}`,
+      { headers }
+    );
+  }
+
+  getCandsByTypeGlobal() {
+     const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.authService.getToken()}`
+    });
+    return this.http.get<Record<string, number>>(
+      `${this.BASE_URL}/admin/stats/candidatures-par-type`,
+      { headers }
+    );
+  }
 }

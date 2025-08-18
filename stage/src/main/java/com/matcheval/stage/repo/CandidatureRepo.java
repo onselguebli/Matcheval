@@ -1,6 +1,7 @@
 package com.matcheval.stage.repo;
 
 import com.matcheval.stage.dto.SiteStatsDTO;
+import com.matcheval.stage.dto.SiteTypeCountDTO;
 import com.matcheval.stage.model.Candidature;
 import com.matcheval.stage.model.OffreSiteExterne;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,8 +19,36 @@ public interface CandidatureRepo extends JpaRepository<Candidature,Long> {
     List<Object[]> countCandidaturesByMonth();
 
 
-
-
+    @Query("""
+        select new com.matcheval.stage.dto.SiteTypeCountDTO(se.nom, o.typeOffre, count(c))
+        from Candidature c
+           join c.offre o
+           join c.sourceSite ose
+           join ose.siteExterne se
+        group by se.nom, o.typeOffre
+        order by se.nom asc, o.typeOffre asc
+    """)
+    List<SiteTypeCountDTO> countBySiteAndType();
+    @Query("""
+        select new com.matcheval.stage.dto.SiteTypeCountDTO(se.nom, o.typeOffre, count(c))
+        from Candidature c
+           join c.offre o
+           join o.recruteur r
+           join c.sourceSite ose
+           join ose.siteExterne se
+        where r.email = :recruteurEmail
+        group by se.nom, o.typeOffre
+        order by se.nom asc, o.typeOffre asc
+    """)
+    List<SiteTypeCountDTO> countBySiteAndTypeForRecruteur(String recruteurEmail);
+    @Query("""
+    select o.typeOffre as type, count(c) as cnt
+    from Candidature c
+      join c.offre o
+    group by o.typeOffre
+    order by o.typeOffre
+  """)
+    List<Object[]> countCandidaturesByType();
 
 }
 

@@ -11,11 +11,21 @@ public class CV {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private  String file;
-    private String contenuTexte;
-    private String format;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Column(columnDefinition = "bytea")
+    private byte[] data;
+
+
+    private String originalFilename;
+    private String contentType;
+    private Long size;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date dateUpload;
+
+    private String contenuTexte;
+
     @OneToOne
-    @JoinColumn(name = "candidature_id")
+    @JoinColumn(name = "candidature_id", unique = true)
     private Candidature candidature;
 }

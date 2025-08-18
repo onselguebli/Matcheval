@@ -12,14 +12,12 @@
       <svg cIcon name="cilMenu" size="lg"></svg>
     </button>
     <c-header-nav class="d-none d-md-flex">
+     
+     
       <c-nav-item>
-        <a cNavLink routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-      </c-nav-item>
-      <c-nav-item>
-        <a cNavLink routerLink="/users" routerLinkActive="active">Users</a>
-      </c-nav-item>
-      <c-nav-item>
-        <a cNavLink routerLink="/settings" routerLinkActive="active">Settings</a>
+       <a cNavLink [routerLink]="dashboardLink" routerLinkActive="active">
+  Dashboard
+</a>
       </c-nav-item>
     </c-header-nav>
 
@@ -69,6 +67,12 @@
       />
     </button>
     <ul cDropdownMenu class="pt-0 w-auto">
+      <li>
+  <h6 cDropdownHeader class="bg-body-secondary text-body-secondary fw-semibold py-2 rounded-top">
+    {{ displayName || 'Utilisateur' }} <span *ngIf="displayRole">— {{ displayRole }}</span>
+  </h6>
+</li>
+
       <li>
         <h6 cDropdownHeader class="bg-body-secondary text-body-secondary fw-semibold py-2 rounded-top">
           Account

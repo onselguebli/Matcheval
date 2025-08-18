@@ -45,7 +45,7 @@ private toastservice: ToastService ) {}
         }
       },
       error: (err) => {
-        console.error('Login failed:', err);
+        this.toastservice.showError('Login failed:');
         alert('Login failed: ' + (err.error?.message || 'Unknown error'));
       }
     });

@@ -45,6 +45,22 @@
         <option value="Refusée">❌ Refusée</option>
       </select>
     </div>
+<p *ngIf="selectedCandidature?.hasCv">
+  <strong>📎 CV :</strong>
+  <span class="me-2">
+    {{ selectedCandidature.cvFilename || 'cv.pdf' }}
+    <small class="text-muted" *ngIf="selectedCandidature.cvSize">
+      ({{ selectedCandidature.cvSize | number }} octets)
+    </small>
+  </span>
+  <button class="btn btn-outline-primary btn-sm"
+          (click)="downloadCv(selectedCandidature.id, selectedCandidature.cvFilename)">
+    ⬇️ Télécharger
+  </button>
+</p>
+<p *ngIf="!selectedCandidature?.hasCv" class="text-muted">
+  Aucun CV disponible.
+</p>
 
     <div class="d-flex justify-content-end gap-2">
       <button class="btn btn-success" (click)="updateStatut()">💾 Mettre à jour</button>

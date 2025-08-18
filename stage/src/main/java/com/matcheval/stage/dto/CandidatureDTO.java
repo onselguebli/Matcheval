@@ -15,4 +15,9 @@ public class CandidatureDTO {
     private String candidatPrenom;
     private String candidatEmail;
     private String titreOffre;
+
+    private String cvFilename;
+    private String cvContentType;
+    private Long cvSize;
+    private Boolean hasCv;
 }

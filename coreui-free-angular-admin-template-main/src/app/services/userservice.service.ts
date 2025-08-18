@@ -44,6 +44,16 @@ getCandidatureById(id: number) {
   return this.http.get(`${this.BASE_URL}/recruiter/candidature/${id}`,  { headers });
 }
 
+getCvFile(candidatureId: number) {
+  const headers = new HttpHeaders({ 'Authorization': `Bearer ${this.authService.getToken()}` });
+  return this.http.get(`${this.BASE_URL}/recruiter/candidature/${candidatureId}/cv`, {
+    headers,
+    observe: 'response',
+    responseType: 'blob'
+  });
+}
+
+
 updateCandidatureStatut(id: number, dto: any) {
    const headers = new HttpHeaders({ 'Authorization': `Bearer ${this.authService.getToken()}` });
   return this.http.put(`${this.BASE_URL}/recruiter/candidature/${id}/statut`, dto, { headers });
@@ -51,7 +61,7 @@ updateCandidatureStatut(id: number, dto: any) {
 
 getOffresByRecruteur(email: string): Observable<any[]> {
   const headers = new HttpHeaders({ Authorization: `Bearer ${this.authService.getToken()}` });
-  return this.http.get<any[]>(`${this.BASE_URL}/offresByrecruteur/${email}`, { headers });
+  return this.http.get<any[]>(`${this.BASE_URL}/recruiter/offresByrecruteur/${email}`, { headers });
 }
 
 updateOffre(id: number, data: any) {

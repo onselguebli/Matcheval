@@ -25,8 +25,12 @@ export const routes: Routes = [
       {
       path: 'pages_recruteur',
       loadChildren: () => import('./pages_recruteur/routes').then(m => m.routes)
+    },
+    {
+      path: 'dashboardRec',
+      loadChildren: () => import('./views/dashboardRec/routes').then(m => m.routes)
       
-    }
+    },
     ]
   },
   {
@@ -51,15 +55,7 @@ export const routes: Routes = [
       loadChildren: () => import('./pages_admin/routes').then(m => m.routes)
       
     },
-    {
-        path: 'theme',
-        loadChildren: () => import('./views/theme/routes').then((m) => m.routes)
-      },
-
-      {
-        path: 'widgets',
-        loadChildren: () => import('./views/widgets/routes').then((m) => m.routes)
-      },
+   
       {
         path: 'pages',
         loadChildren: () => import('./views/pages/routes').then((m) => m.routes)
@@ -90,5 +86,8 @@ export const routes: Routes = [
     }
   },
   
-  { path: '**', redirectTo: 'login' }
+  { 
+    path: '**', 
+    redirectTo: '/404' 
+  }
 ];

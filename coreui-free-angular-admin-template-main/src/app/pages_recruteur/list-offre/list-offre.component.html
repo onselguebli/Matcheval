@@ -1,15 +1,47 @@
 <div class="container mt-5">
-  <h4 class="mb-3">✍️ Mes offres à modifier</h4>
+  <h4 class="mb-4">✍️ Mes offres à modifier</h4>
 
-  <div *ngFor="let offre of offresRecruteur" class="card mb-3 shadow-sm border-0">
-    <div class="card-body">
-      <h5 class="card-title">{{ offre.titre }}</h5>
-      <p class="card-text text-muted">{{ offre.description }}</p>
-      <button class="btn btn-outline-primary btn-sm" (click)="editOffre(offre)">
-        Modifier
-      </button>
+  <!-- Actives -->
+  <h6 class="mb-2 text-success">
+    Offres actives ({{ offresActives.length }})
+  </h6>
+  <div *ngIf="offresActives.length; else noActive">
+    <div *ngFor="let offre of offresActives" class="card mb-3 shadow-sm border-0" [ngClass]="statusClass(offre)">
+      <div class="card-body">
+        <h5 class="card-title d-flex align-items-center gap-2">
+          {{ offre.titre }}
+          <span class="badge bg-success">Active</span>
+        </h5>
+        <p class="card-text text-muted">{{ offre.description }}</p>
+        <button class="btn btn-outline-primary btn-sm" (click)="editOffre(offre)">Modifier</button>
+      </div>
     </div>
   </div>
+  <ng-template #noActive>
+    <p class="text-muted">Aucune offre active.</p>
+  </ng-template>
+
+  <hr class="my-4">
+
+  <!-- Inactives -->
+  <h6 class="mb-2 text-danger">
+    Offres inactives ({{ offresInactives.length }})
+  </h6>
+  <div *ngIf="offresInactives.length; else noInactive">
+    <div *ngFor="let offre of offresInactives" class="card mb-3 shadow-sm border-0" [ngClass]="statusClass(offre)">
+      <div class="card-body">
+        <h5 class="card-title d-flex align-items-center gap-2">
+          {{ offre.titre }}
+          <span class="badge bg-danger">Inactive</span>
+        </h5>
+        <p class="card-text text-muted">{{ offre.description }}</p>
+        <button class="btn btn-outline-primary btn-sm" (click)="editOffre(offre)">Modifier</button>
+      </div>
+    </div>
+  </div>
+  <ng-template #noInactive>
+    <p class="text-muted">Aucune offre inactive.</p>
+  </ng-template>
 
   <!-- Modal de modification -->
   <div *ngIf="selectedOffre" class="modal-wrapper">
@@ -26,12 +58,28 @@
         <label class="form-label">Description</label>
         <textarea [(ngModel)]="selectedOffre.description" class="form-control"></textarea>
       </div>
+<div class="mb-3">
+  <label class="form-label">Date de publication</label>
+  <input [(ngModel)]="selectedOffre.datePublication" type="date" class="form-control">
+</div>
+
+<div class="mb-3">
+  <label class="form-label">Date d'expiration</label>
+  <input [(ngModel)]="selectedOffre.dateExpiration" type="date" class="form-control">
+</div>
 
       <div class="mb-3">
         <label class="form-label">Localisation</label>
         <input [(ngModel)]="selectedOffre.localisation" class="form-control" />
       </div>
-
+<div class="mb-3">
+  <label class="form-label">Type d'offre</label>
+  <select [(ngModel)]="selectedOffre.typeOffre" class="form-select">
+    <option value="">-- Sélectionner --</option>
+    <option value="IT">IT</option>
+    <option value="Business">Business</option>
+  </select>
+</div>
       <div class="mb-3">
         <label class="form-label">Statut</label>
         <select [(ngModel)]="selectedOffre.statut" class="form-select">

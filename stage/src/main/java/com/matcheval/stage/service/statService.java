@@ -292,5 +292,50 @@ public class statService implements IstatService {
         return offreSiteExterneRepo.getStatsBySite();
     }
 
+    @Override
+    public Map<String, Long> getOffresCountByType() {
+        Map<String, Long> result = new HashMap<>();
+        List<Object[]> data = offreRepo.countOffresByType();
+        for (Object[] row : data) {
+            String type = row[0] != null ? row[0].toString() : "INCONNU";
+            Long count = (Long) row[1];
+            result.put(type, count);
+        }
+        return result;
+    }
+    @Override
+     public Map<String, Map<String, Long>> candidaturesParSiteEtType() {
+        List<SiteTypeCountDTO> rows = candidatureRepo.countBySiteAndType();
+        return toNestedMap(rows);
+    }
+    @Override
+    public Map<String, Map<String, Long>> candidaturesParSiteEtTypePourRecruteur(String recruteurEmail) {
+        List<SiteTypeCountDTO> rows = candidatureRepo.countBySiteAndTypeForRecruteur(recruteurEmail);
+        return toNestedMap(rows);
+    }
+    @Override
+    public Map<String, Map<String, Long>> toNestedMap(List<SiteTypeCountDTO> rows) {
+        // site -> (typeOffre -> count)
+        Map<String, Map<String, Long>> result = new LinkedHashMap<>();
+        for (SiteTypeCountDTO r : rows) {
+            String site = Optional.ofNullable(r.getSite()).orElse("Inconnu");
+            String type = r.getTypeOffre()!= null ? r.getTypeOffre().name() : "UNKNOWN";
+            result.computeIfAbsent(site, k -> new LinkedHashMap<>())
+                    .merge(type, r.getCount(), Long::sum);
+        }
+        return result;
+    }
+    @Override
+    public Map<String, Long> candidaturesParTypeGlobal() {
+        List<Object[]> rows = candidatureRepo.countCandidaturesByType();
+        Map<String, Long> map = new LinkedHashMap<>();
+        for (Object[] r : rows) {
+            // r[0] = TypeOffre (enum), r[1] = Long (count)
+            String type = (r[0] != null) ? r[0].toString() : "UNKNOWN";
+            Long count = (r[1] != null) ? (Long) r[1] : 0L;
+            map.put(type, count);
+        }
+        return map;
+    }
 
 }

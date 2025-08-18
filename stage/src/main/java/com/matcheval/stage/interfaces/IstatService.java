@@ -1,9 +1,6 @@
 package com.matcheval.stage.interfaces;
 
-import com.matcheval.stage.dto.MonthlyDashboardDTO;
-import com.matcheval.stage.dto.RecruteurOffreStatDTO;
-import com.matcheval.stage.dto.SiteStatsDTO;
-import com.matcheval.stage.dto.TrafficDashboardDTO;
+import com.matcheval.stage.dto.*;
 import com.matcheval.stage.model.OffreEmploi;
 import com.matcheval.stage.model.Users;
 
@@ -29,5 +26,10 @@ public interface IstatService {
     List<SiteStatsDTO> getStatsParSite();
 
 
+    Map<String, Long> getOffresCountByType();
+    Map<String, Map<String, Long>> candidaturesParSiteEtType();
+    Map<String, Map<String, Long>> candidaturesParSiteEtTypePourRecruteur(String recruteurEmail);
+    Map<String, Map<String, Long>> toNestedMap(List<SiteTypeCountDTO> rows);
 
+    Map<String, Long> candidaturesParTypeGlobal();
 }

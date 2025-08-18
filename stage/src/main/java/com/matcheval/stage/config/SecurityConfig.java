@@ -43,6 +43,13 @@ private JWTFilter jwtFilter;
                         .requestMatchers("/admin/**").hasAnyRole(Roles.ADMIN.name())
                         .requestMatchers("manager/**").hasAnyRole(Roles.MANAGER.name())
                         .requestMatchers("recruiter/**").hasAnyRole(Roles.RECRUITER.name())
+                        // --- Pair combinations
+                        .requestMatchers("/admin-manager/**").hasAnyRole("ADMIN","MANAGER")
+                        .requestMatchers("/admin-recruiter/**").hasAnyRole("ADMIN","RECRUITER")
+                        .requestMatchers("/manager-recruiter/**").hasAnyRole("MANAGER","RECRUITER")
+
+                        // --- All three roles
+                        .requestMatchers("/all-roles/**", "/stats/**").hasAnyRole("ADMIN","MANAGER","RECRUITER")
                         .anyRequest().authenticated()).
                 sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

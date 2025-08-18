@@ -1,0 +1,102 @@
+:host {
+  .legend {
+    small {
+      font-size: x-small;
+    }
+  }
+}
+.chart-card {
+  width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.chart-card c-card-body {
+  padding: 1rem;
+}
+
+.text-center  {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.table tbody tr:hover {
+  background-color: #f1f1f1;
+  transition: background-color 0.2s ease-in-out;
+}
+
+
+.custom-colored-table tbody tr.top-row-1 {
+  background-color: rgba(54, 185, 204, 0.3);
+  font-weight: 900;
+}
+
+.custom-colored-table tbody tr.top-row-2 {
+  background-color: rgba(54, 185, 204, 0.2);
+  font-weight: 700;
+}
+
+.custom-colored-table tbody tr.top-row-3 {
+  background-color: rgba(54, 185, 204, 0.1);
+  font-weight: 600;
+}
+
+/* Pour préserver le survol (hover) */
+.custom-colored-table.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.075); /* Couleur hover par défaut de Bootstrap */
+}
+.offers-section {
+  margin-top: 20px;
+
+  .section-title {
+    font-weight: bold;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: #4b4bff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+.offer-card {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #5a54f0, #7b6cf6);
+  color: white;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(90, 84, 240, 0.3);
+  }
+
+  .offer-label {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+  }
+
+  .offer-content {
+    h5 {
+      font-weight: bold;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+  }
+}

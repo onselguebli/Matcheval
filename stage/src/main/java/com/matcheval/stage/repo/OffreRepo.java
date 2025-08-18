@@ -32,4 +32,7 @@ public interface OffreRepo extends JpaRepository<OffreEmploi,Long> {
     List<OffreEmploi> findOffresWithCandidaturesByRecruteur(@Param("recruteurEmail") String recruteurEmail);
 
     List<OffreEmploi> findByRecruteurEmail(String email);
+
+    @Query("SELECT o.typeOffre, COUNT(o) FROM OffreEmploi o GROUP BY o.typeOffre")
+    List<Object[]> countOffresByType();
 }

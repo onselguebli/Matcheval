@@ -30,6 +30,7 @@ import { StatService } from '../../services/stat.service';
 import { TrafficDashboardDTO } from '../../models/TrafficDashboar';
 import { SiteTypeCount } from '../../models/SiteTypeCount';
 import { AuthService } from '../../services/auth.service';
+import { StatRecService } from '../../services/stat-rec.service';
 
 interface IUser {
   name: string;
@@ -46,12 +47,12 @@ interface IUser {
 }
 
 @Component({
-  templateUrl: 'dashboard.component.html',
-  styleUrls: ['dashboard.component.scss'],
-  imports: [WidgetsDropdownComponent,CardComponent, Pagination1Component, FormsModule,CommonModule, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent]
+  templateUrl: 'dashboardRec.component.html',
+  styleUrls: ['dashboardRec.component.scss'],
+  imports: [WidgetsDropdownComponent,CardComponent, Pagination1Component, FormsModule,CommonModule, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent]
 })
-export class DashboardComponent implements OnInit {
-constructor(private statService: StatService,private cdRef: ChangeDetectorRef,public  authService: AuthService) {}
+export class DashboardRecComponent implements OnInit {
+constructor(private statService: StatService,private cdRef: ChangeDetectorRef,public  authService: AuthService,private statRecService:StatRecService) {}
   userRoles: string[] = [];
   offresByType: { type: string, count: number }[] = [];
   userCounts: number[] = [];
@@ -76,13 +77,11 @@ filteredStats: any[] = [];
 currentPage: number = 1;
 itemsPerPage: number = 8;
 
- data: Record<string, number> = {};
-  types: string[] = [];
-  loading = false;
 
 
 statsGlobales: any = {};
-  
+  statsPersonnelles: any = {};
+  affichage: 'global' | 'personnel' = 'global';
   
 ////////////*** lfou9 jdyyyd ******** *////////////
 
@@ -218,9 +217,9 @@ statsGlobales: any = {};
   //***************jdyyyd te3iii */
    ngOnInit(): void {
     this.loadUsersByCivility();
-    this.getCandsByTypeGlobal();
     this.getCVsToday();
     this.getCandsBySiteType();
+    this.getCandsBySiteTypeForRecruteur('');
     this.getOffresByType();
     this.loadUsersByStatus();
     this.getOffresParRecruteur();
@@ -460,69 +459,26 @@ getTypeIcon(type: string): string {
     });
   }
 
-  
+  getCandsBySiteTypeForRecruteur(email: string) {
+     if (this.authService.getUserRole() === 'RECRUITER') {
+      const email = this.authService.getRecruteurEmail();
+      if (email) {
+        this.statRecService.getCandsBySiteTypeForRecruteur(email).subscribe({
+          next: (data) => {
+             this.statsPersonnelles = data;
+          },
+          error: (err) => {
+            console.error('Error loading personal stats', err);
+          }
+        });
+      }
+    }
+  }
 
   // Pour pouvoir utiliser Object.keys() dans le template
 objectKeys(obj: any): string[] {
   return obj ? Object.keys(obj) : [];
 }
 
-  typesOf(site: string): string[] {
-  if (!this.statsGlobales?.[site]) return [];
-  return Object.keys(this.statsGlobales[site]).sort((a,b) =>
-    this.statsGlobales[site][b] - this.statsGlobales[site][a]); // tri desc
-}
-
-count(site: string, type: string): number {
-  return this.statsGlobales?.[site]?.[type] ?? 0;
-}
-
-totalSite(site: string): number {
-  return Object.values(this.statsGlobales?.[site] || {}).reduce((a: number, b: any) => a + +b, 0);
-}
-
-percent(site: string, type: string): number {
-  const tot = this.totalSite(site);
-  if (!tot) return 0;
-  return Math.round((this.count(site, type) / tot) * 100);
-}
-
-// palette par type (ajoute/édite selon tes types)
-private typeColors: Record<string, string> = {
-  IT: '#0ea5e9',          // Sky
-  FINANCE: '#8b5cf6',     // Violet
-  MARKETING: '#f59e0b',   // Amber
-  RH: '#10b981',          // Emerald
-};
-
-colorFor(type: string): string {
-  return this.typeColors[type] || '#64748b'; // Slate (fallback)
-}
-getCandsByTypeGlobal(){
-  this.loading = true;
-this.statService.getCandsByTypeGlobal().subscribe({
-      next: (res) => {
-        this.data = res || {};
-        this.types = Object.keys(this.data).sort((a,b) => this.data[b]-this.data[a]);
-        this.loading = false;
-      },
-      error: () => this.loading = false
-    });
-
-}
- total(): number {
-    return Object.values(this.data).reduce((a, b) => a + (b || 0), 0);
-  }
-
-  pct(t: string): number {
-    const tot = this.total(); if (!tot) return 0;
-    return Math.round((this.data[t] / tot) * 100);
-  }
-
-  color(t: string): string {
-    const palette: Record<string,string> = {
-      IT: '#0ea5e9', FINANCE: '#8b5cf6', MARKETING: '#f59e0b', RH: '#10b981'
-    };
-    return palette[t] || '#64748b';
-  }
+  
 }

@@ -24,6 +24,7 @@ selectedCandidature: any = null;
 
   ngOnInit(): void {
     this.loadCandidatures();
+    
   }
 
   loadCandidatures(): void {
@@ -42,6 +43,32 @@ selectedCandidature: any = null;
   console.error('Recruiter email is null. User may not be authenticated.');
 }
   }
+  // liste-candidatures.component.ts
+downloadCv(candidatureId: number, filename?: string) {
+  this.userService.getCvFile(candidatureId).subscribe({
+    next: (res) => {
+      const blob = res.body as Blob;
+      const contentDisposition = res.headers.get('Content-Disposition') || '';
+      const match = /filename="([^"]+)"/.exec(contentDisposition);
+      const finalName = match?.[1] || filename || 'cv.pdf';
+
+      // Trigger browser download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = finalName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    },
+    error: (err) => {
+      console.error('Erreur téléchargement CV', err);
+      this.toast?.showError?.('Téléchargement du CV impossible');
+    }
+  });
+}
+
 
 showDetails(candidatureId: number): void {
   this.selectedCandidatureId = candidatureId;

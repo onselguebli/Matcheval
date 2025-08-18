@@ -9,7 +9,11 @@ import com.matcheval.stage.dto.ReqRes;
 import com.matcheval.stage.model.Candidature;
 import com.matcheval.stage.model.OffreEmploi;
 import com.matcheval.stage.service.OffreService;
+import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +43,21 @@ public class UserController {
     public ResponseEntity<CandidatureDTO> getCandidatureById(@PathVariable Long id) {
         return candidatureService.getCandidatureById(id);
     }
+
+    @GetMapping("/candidature/{id}/cv")
+    public ResponseEntity<Resource> downloadCv(@PathVariable Long id) {
+        ByteArrayResource resource = candidatureService.getCvFile(id);
+        String filename    = candidatureService.getCvFilename(id);
+        String contentType = candidatureService.getCvContentType(id);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(
+                        (contentType != null && !contentType.isBlank()) ? contentType : "application/octet-stream"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentLength(resource.contentLength())
+                .body(resource); // ByteArrayResource implémente org.springframework.core.io.Resource
+    }
+
 
     @PutMapping("/candidature/{id}/statut")
     public ResponseEntity<CandidatureDTO> updateStatut(

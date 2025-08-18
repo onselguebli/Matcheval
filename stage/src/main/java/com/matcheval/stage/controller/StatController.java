@@ -85,7 +85,20 @@ public class StatController {
     public ResponseEntity<List<SiteStatsDTO>> getStatsParSite() {
         return ResponseEntity.ok(statService.getStatsParSite());
     }
+    @GetMapping("/stats/offres-by-type")
+    public ResponseEntity<Map<String, Long>> getOffresByType() {
+        return ResponseEntity.ok(statService.getOffresCountByType());
+    }
+    // Global
+    @GetMapping("/stats/candidatures-par-site-type")
+    public ResponseEntity<Map<String, Map<String, Long>>> candidaturesParSiteEtType() {
+        return ResponseEntity.ok(statService.candidaturesParSiteEtType());
+    }
 
 
+    @GetMapping("/stats/candidatures-par-type")
+    public ResponseEntity<Map<String, Long>> candidaturesParTypeGlobal() {
+        return ResponseEntity.ok(statService.candidaturesParTypeGlobal());
+    }
 
 }

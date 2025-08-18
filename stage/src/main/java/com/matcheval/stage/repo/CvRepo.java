@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CvRepo extends JpaRepository<CV, Long> {
@@ -19,4 +20,7 @@ public interface CvRepo extends JpaRepository<CV, Long> {
     @Query("SELECT EXTRACT(year FROM c.dateUpload), COUNT(c) FROM CV c GROUP BY EXTRACT(year FROM c.dateUpload) ORDER BY EXTRACT(year FROM c.dateUpload)")
     List<Object[]> countByYear();
     Long countByDateUploadBetween(Date start, Date end);
+
+    Optional<CV> findByCandidatureId(Long candidatureId);
+    boolean existsByCandidatureId(Long candidatureId);
 }

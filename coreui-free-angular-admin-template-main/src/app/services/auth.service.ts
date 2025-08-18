@@ -38,6 +38,14 @@ getRecruteurEmail(): string | null {
 }
 
 
+getUsername(): string | null {
+  const token = this.getToken();
+  if (!token) return null;
+  const decoded = jwtDecode<DecodedToken>(token);
+  // si tu stockes le nom ailleurs, adapte : decoded.name / decoded.email / etc.
+  return decoded.sub ?? null;
+}
+
   // Get role without prefix for frontend logic
   getUserRole(): string | null {
     const role = this.getRawRole();
@@ -59,6 +67,14 @@ getRecruteurEmail(): string | null {
     }
   }
 
+  getDashboardFor(role: string | null | undefined): string {
+  switch (role) {
+    case 'ADMIN':     return '/admin-dashboard/dashboard';
+    case 'MANAGER':   return '/manager-dashboard/dashboard';
+    case 'RECRUITER': return '/recruiter-dashboard/dashboard';
+    default:          return '/login';
+  }
+}
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
