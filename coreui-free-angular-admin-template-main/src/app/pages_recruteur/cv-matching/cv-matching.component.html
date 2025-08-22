@@ -1,0 +1,232 @@
+<div class="cv-matching-container">
+  <div class="header">
+    <h2>🔍 Matching CVs avec Offres d'Emploi</h2>
+    <p>Analysez la correspondance entre des CVs et vos offres d'emploi</p>
+  </div>
+
+  <!-- Section de sélection -->
+  <div class="selection-section">
+    <div class="form-group">
+      <label for="offreSelect">Sélectionner une offre d'emploi:</label>
+      
+      <!-- Indicateur de chargement -->
+      <div *ngIf="loadingOffres" class="loading-indicator">
+        <div class="spinner"></div>
+        <span>Chargement de vos offres...</span>
+      </div>
+
+      <select 
+        id="offreSelect" 
+        class="form-control" 
+        (change)="onOffreSelected($event)"
+        [disabled]="loadingOffres || offres.length === 0">
+        
+        <option value="">-- Choisir une offre --</option>
+        <option *ngFor="let offre of offres" [value]="offre.id">
+          {{ offre.titre }} - {{ offre.localisation }}
+          ({{ offre.datePublication | date:'dd/MM/yyyy' }})
+        </option>
+      </select>
+
+      <!-- Message si aucune offre -->
+      <div *ngIf="!loadingOffres && offres.length === 0" class="no-offres">
+        <p>📝 Aucune offre d'emploi créée.</p>
+        <a routerLink="/creer-offre" class="btn-create-offre">
+          ➕ Créer une offre
+        </a>
+      </div>
+    </div>
+
+    <!-- Offre sélectionnée -->
+    <div class="selected-offre" *ngIf="selectedOffre">
+      <div class="offre-header">
+        <h4>🎯 Offre sélectionnée</h4>
+        <span class="offre-id">#{{ selectedOffre.id }}</span>
+      </div>
+      <div class="offre-details">
+        <h5>{{ selectedOffre.titre }}</h5>
+        <p class="location">📍 {{ selectedOffre.localisation }}</p>
+        <p class="date">📅 Publiée le: {{ selectedOffre.datePublication | date:'dd/MM/yyyy' }}</p>
+        <div class="description">
+          <p>{{ selectedOffre.description  }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload de fichiers -->
+    <div class="file-upload-section">
+      <label for="cvFiles">📂 Sélectionner des CVs (PDF):</label>
+      <div class="file-input-container">
+        <input 
+          id="cvFiles" 
+          type="file" 
+          multiple 
+          accept=".pdf" 
+          (change)="onFileSelected($event)"
+          class="file-input">
+        <label for="cvFiles" class="file-input-label">
+          📁 Choisir des fichiers
+        </label>
+      </div>
+
+      <!-- Fichiers sélectionnés -->
+      <div class="selected-files" *ngIf="selectedFiles.length > 0">
+        <h5>📋 Fichiers sélectionnés ({{ selectedFiles.length }})</h5>
+        <div class="files-list">
+          <div *ngFor="let file of selectedFiles" class="file-item">
+            <span class="file-icon">📄</span>
+            <span class="file-name">{{ file.name }}</span>
+            <span class="file-size">({{ file.size }})</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button 
+        class="btn btn-primary" 
+        (click)="uploadAndMatch()" 
+        [disabled]="!selectedOffre || selectedFiles.length === 0 || uploading">
+        <span *ngIf="uploading" class="btn-spinner"></span>
+        {{ uploading ? '⏳ Analyse en cours...' : '🚀 Analyser les CVs' }}
+      </button>
+
+      <button 
+        class="btn btn-secondary" 
+        (click)="matchExistingCvs()" 
+        [disabled]="!selectedOffre || loading">
+        <span *ngIf="loading" class="btn-spinner"></span>
+        {{ loading ? '⏳ Chargement...' : '📊 Analyser CVs existants' }}
+      </button>
+
+      <button class="btn btn-outline" (click)="clearSelection()">
+        🗑️ Réinitialiser
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages d'état -->
+  <div class="messages">
+    <div *ngIf="error" class="message error">
+      <span class="message-icon">❌</span>
+      <span class="message-text">{{ error }}</span>
+      <button class="message-close" (click)="error = null">×</button>
+    </div>
+
+    <div *ngIf="success" class="message success">
+      <span class="message-icon">✅</span>
+      <span class="message-text">{{ success }}</span>
+      <button class="message-close" (click)="success = null">×</button>
+    </div>
+
+    <div *ngIf="loading" class="message info">
+      <span class="message-icon">⏳</span>
+      <span class="message-text">Analyse des CVs en cours...</span>
+    </div>
+  </div>
+
+  <!-- Résultats -->
+  <div class="results-section" *ngIf="matchingResults.length > 0">
+    <div class="results-header">
+      <h3>📊 Résultats du Matching</h3>
+      <div class="results-actions">
+        <span class="results-count">{{ matchingResults.length }} résultat(s)</span>
+        <button class="btn btn-download" (click)="downloadResults()">
+          📥 Exporter CSV
+        </button>
+      </div>
+    </div>
+
+    <div class="results-grid">
+      <div *ngFor="let result of matchingResults; let i = index" class="result-card">
+        <div class="card-header">
+          <div class="card-rank">#{{ i + 1 }}</div>
+          <h4>{{ result.filename }}</h4>
+          <span class="score-badge" [class]="getScoreClass(result.score_overall)">
+            {{ result.score_overall * 100 | number:'1.0-0' }}%
+          </span>
+        </div>
+
+       <div class="candidate-info">
+  <div class="info-item">
+    <span class="info-icon">📧</span>
+    <span>{{ result.cv_extracted?.email || 'Non disponible' }}</span>
+  </div>
+  <div class="info-item">
+    <span class="info-icon">📞</span>
+    <span>{{ result.cv_extracted?.phone || 'Non disponible' }}</span>
+  </div>
+  <div class="info-item">
+    <span class="info-icon">⏳</span>
+    <span>{{ (result.cv_extracted?.years_experience ?? 0) }} ans d'expérience</span>
+  </div>
+  <div class="info-item">
+    <span class="info-icon">📍</span>
+    <span>{{ result.cv_extracted?.location || 'Non spécifiée' }}</span>
+  </div>
+</div>
+
+
+        <div class="skills-section">
+          <h5>✅ Compétences correspondantes</h5>
+          <div class="skills-list">
+            <span *ngFor="let skill of result.cv_extracted.skills" class="skill-tag matched">
+              {{ skill }}
+            </span>
+          </div>
+        </div>
+
+        <div *ngIf="result.missing_skills.length > 0" class="skills-section">
+          <h5>❌ Compétences manquantes</h5>
+          <div class="skills-list">
+            <span *ngFor="let skill of result.missing_skills" class="skill-tag missing">
+              {{ skill }}
+            </span>
+          </div>
+        </div>
+
+        <div class="criteria-scores">
+          <h5>📈 Détail des scores</h5>
+          <div class="score-item">
+            <span class="score-label">Titre</span>
+            <span class="score-value">{{ result.criteria.title_match * 100 | number:'1.0-0' }}%</span>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="result.criteria.title_match * 100"></div>
+            </div>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Compétences</span>
+            <span class="score-value">{{ result.criteria.skills_match * 100 | number:'1.0-0' }}%</span>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="result.criteria.skills_match * 100"></div>
+            </div>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Expérience</span>
+            <span class="score-value">{{ result.criteria.experience_match * 100 | number:'1.0-0' }}%</span>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="result.criteria.experience_match * 100"></div>
+            </div>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Localisation</span>
+            <span class="score-value">{{ result.criteria.location_match * 100 | number:'1.0-0' }}%</span>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="result.criteria.location_match * 100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aucun résultat -->
+  <div *ngIf="!loading && matchingResults.length === 0 && selectedOffre" class="no-results">
+    <div class="no-results-content">
+      <span class="no-results-icon">🔍</span>
+      <h4>Aucun résultat à afficher</h4>
+      <p>Veuillez analyser des CVs pour voir les résultats de matching.</p>
+    </div>
+  </div>
+</div>

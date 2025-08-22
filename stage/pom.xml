@@ -97,7 +97,24 @@
             <artifactId>spring-context-support</artifactId>
             <version>6.2.2</version>
         </dependency>
-    </dependencies>
+		<!-- web + http client réactif -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+
+		<!-- JSON -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>2.0.29</version>
+		</dependency>
+
+	</dependencies>
 
 	<build>
 		<plugins>

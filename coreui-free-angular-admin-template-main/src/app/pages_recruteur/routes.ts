@@ -28,6 +28,13 @@ export const routes: Routes = [
           title: 'liste-offres' 
         }
       },
+      {
+        path: 'cv-matching',
+        loadComponent: () => import('./cv-matching/cv-matching.component').then(m => m.CvMatchingComponent),
+        data: {
+          title: 'cv-matching' 
+        }
+      },
     ]
   }
 ];
