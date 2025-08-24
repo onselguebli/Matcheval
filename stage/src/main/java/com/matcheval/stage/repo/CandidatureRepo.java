@@ -1,9 +1,7 @@
 package com.matcheval.stage.repo;
 
-import com.matcheval.stage.dto.SiteStatsDTO;
 import com.matcheval.stage.dto.SiteTypeCountDTO;
 import com.matcheval.stage.model.Candidature;
-import com.matcheval.stage.model.OffreSiteExterne;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -49,6 +47,8 @@ public interface CandidatureRepo extends JpaRepository<Candidature,Long> {
     order by o.typeOffre
   """)
     List<Object[]> countCandidaturesByType();
+
+
 
 }
 

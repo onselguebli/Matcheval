@@ -1,0 +1,45 @@
+<!-- src/app/components/checked-list/checked-list.component.html -->
+<div class="checked-list">
+  <h2>📄 CV cochés</h2>
+
+  <div *ngIf="isManager" class="filters">
+    <label>Filtrer par email de recruteur :</label>
+    <input type="email" [(ngModel)]="recruteurEmailFilter" placeholder="recruteur@example.com" />
+    <button class="btn btn-sm btn-primary" (click)="load()">Filtrer</button>
+    <button class="btn btn-sm btn-outline-secondary" (click)="recruteurEmailFilter=null; load()">Réinitialiser</button>
+  </div>
+
+  <div *ngIf="loading" class="loading-indicator"><div class="spinner"></div>Chargement...</div>
+  <div *ngIf="error" class="message error">{{ error }}</div>
+
+<table class="table" *ngIf="!loading && items.length > 0">
+  <thead>
+    <tr>
+      <th>Offre</th>
+      <th>Candidat</th>
+      <th>Email</th>
+      <th>Score</th>
+      <th>Recruteur</th>
+      <th>Créé le</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let it of items">
+      <td>#{{ it.offreId || '-' }} - {{ it.offreTitre || '-' }}</td>
+      <td>{{ (it.candidatPrenom || '') + ' ' + (it.candidatNom || '') }}</td>
+      <td>{{ it.candidatEmail || '-' }}</td>
+      <td>{{ ((it.scoreOverall ?? 0) * 100) | number:'1.0-0' }}%</td>
+      <td>{{ it.recruteurEmail || '-' }}</td>
+      <td>{{ it.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-danger" (click)="delete(it.id)">🗑️</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <div *ngIf="!loading && items.length === 0" class="empty">
+    Aucun élément coché pour le moment.
+  </div>
+</div>

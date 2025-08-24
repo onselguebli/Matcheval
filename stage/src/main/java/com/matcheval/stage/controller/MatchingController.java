@@ -48,10 +48,23 @@ public class MatchingController {
             @PathVariable Long offreId,
             @PathVariable Long candidatureId) {
         try {
-            // Implémentation similaire à matchAllCvsWithOffre mais pour un CV spécifique
-            return ResponseEntity.ok(Map.of("message", "Fonctionnalité à implémenter"));
+            Map<String, Object> result = matchingService.matchSpecificCv(candidatureId);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
+    @PostMapping("/{offreId}/selected-cvs")
+    public ResponseEntity<List<Map<String, Object>>> matchSelectedCvsForOffre(
+            @PathVariable Long offreId,
+            @RequestBody List<Long> candidatureIds) {
+        try {
+            List<Map<String, Object>> results = matchingService.matchSelectedCvsWithOffre(offreId, candidatureIds);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of(Map.of("error", e.getMessage())));
+        }
+    }
+
+
 }

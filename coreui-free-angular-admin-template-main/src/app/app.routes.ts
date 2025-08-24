@@ -13,7 +13,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./layout/manager-lay/manager-layout/manager-layout.component').then((c) => c.ManagerLayoutComponent),
     canActivate: [RoleGuard],
-    data: { expectedRole: 'MANAGER' }
+    data: { expectedRole: 'MANAGER' },
+    children: [
+      {
+        path: 'ckecked-list',
+      loadComponent: () => import('./checkedlist/checked-list/checked-list.component').then(m => m.CheckedListComponent)
+      }]
   },
   {
     path: 'recruiter-dashboard',
@@ -29,7 +34,10 @@ export const routes: Routes = [
     {
       path: 'dashboardRec',
       loadChildren: () => import('./views/dashboardRec/routes').then(m => m.routes)
-      
+    },
+    {
+      path: 'ckecked-list',
+      loadComponent: () => import('./checkedlist/checked-list/checked-list.component').then(m => m.CheckedListComponent)
     },
     ]
   },

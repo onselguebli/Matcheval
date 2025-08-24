@@ -48,60 +48,142 @@
         <p class="location">📍 {{ selectedOffre.localisation }}</p>
         <p class="date">📅 Publiée le: {{ selectedOffre.datePublication | date:'dd/MM/yyyy' }}</p>
         <div class="description">
-          <p>{{ selectedOffre.description  }}</p>
+          <p>{{ selectedOffre.description }}</p>
         </div>
       </div>
     </div>
 
-    <!-- Upload de fichiers -->
-    <div class="file-upload-section">
-      <label for="cvFiles">📂 Sélectionner des CVs (PDF):</label>
-      <div class="file-input-container">
-        <input 
-          id="cvFiles" 
-          type="file" 
-          multiple 
-          accept=".pdf" 
-          (change)="onFileSelected($event)"
-          class="file-input">
-        <label for="cvFiles" class="file-input-label">
-          📁 Choisir des fichiers
-        </label>
+    <!-- Section 1: Upload de nouveaux CVs -->
+    <div class="section-card">
+      <div class="section-header">
+        <h3>📤 Nouveaux CVs à analyser</h3>
+        <span class="section-badge">Upload</span>
+      </div>
+      
+      <div class="file-upload-section">
+        <label for="cvFiles">📂 Sélectionner des CVs (PDF):</label>
+        <div class="file-input-container">
+          <input 
+            id="cvFiles" 
+            type="file" 
+            multiple 
+            accept=".pdf" 
+            (change)="onFileSelected($event)"
+            class="file-input">
+          <label for="cvFiles" class="file-input-label">
+            📁 Choisir des fichiers
+          </label>
+        </div>
+
+        <!-- Fichiers sélectionnés -->
+        <div class="selected-files" *ngIf="selectedFiles.length > 0">
+          <h5>📋 Fichiers sélectionnés ({{ selectedFiles.length }})</h5>
+          <div class="files-list">
+            <div *ngFor="let file of selectedFiles" class="file-item">
+              <span class="file-icon">📄</span>
+              <span class="file-name">{{ file.name }}</span>
+              <span class="file-size">({{ file.size | number }} bytes)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions pour les nouveaux CVs -->
+        <div class="actions upload-actions">
+          <button 
+            class="btn btn-primary" 
+            (click)="uploadAndMatch()" 
+            [disabled]="!selectedOffre || selectedFiles.length === 0 || uploading">
+            <span *ngIf="uploading" class="btn-spinner"></span>
+            {{ uploading ? '⏳ Analyse en cours...' : '🚀 Analyser les CVs uploadés' }}
+          </button>
+
+          <button class="btn btn-outline" (click)="clearUploadedFiles()">
+            🗑️ Effacer la sélection
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: CVs déjà liés à l'offre -->
+    <div class="section-card" *ngIf="selectedOffre">
+      <div class="section-header">
+        <h3>📁 CVs déjà liés à cette offre</h3>
+        <span class="section-badge">Base de données</span>
       </div>
 
-      <!-- Fichiers sélectionnés -->
-      <div class="selected-files" *ngIf="selectedFiles.length > 0">
-        <h5>📋 Fichiers sélectionnés ({{ selectedFiles.length }})</h5>
-        <div class="files-list">
-          <div *ngFor="let file of selectedFiles" class="file-item">
-            <span class="file-icon">📄</span>
-            <span class="file-name">{{ file.name }}</span>
-            <span class="file-size">({{ file.size }})</span>
+      <!-- Indicateur de chargement -->
+      <div *ngIf="loadingLinkedCvs" class="loading-indicator">
+        <div class="spinner"></div>
+        <span>Chargement des CVs liés...</span>
+      </div>
+
+      <!-- Liste des CVs liés -->
+      <div *ngIf="!loadingLinkedCvs && linkedCvs.length > 0" class="linked-cvs-list">
+        <div class="linked-cvs-header">
+          <span>{{ linkedCvs.length }} CV(s) trouvé(s)</span>
+          <button 
+            class="btn btn-secondary" 
+            (click)="analyzeAllLinkedCvs()" 
+            [disabled]="loading || linkedCvs.length === 0">
+            <span *ngIf="loading" class="btn-spinner"></span>
+            🔍 Analyser tous
+          </button>
+          <div class="actions existing-actions">
+  <button class="btn btn-success" (click)="checkSelected()" [disabled]="loading">
+    ✔️ Ajouter la sélection à la liste
+  </button>
+  <button class="btn btn-outline" routerLink="/checked-list">
+    📄 Voir la liste des CV cochés
+  </button>
+</div>
+        </div>
+
+        <div class="linked-cvs-grid">
+          <div *ngFor="let cv of linkedCvs" class="linked-cv-item">
+            <div class="cv-info">
+              <span class="cv-icon">📄</span>
+              <div class="cv-details">
+                <h5>{{ cv.candidatPrenom }} {{ cv.candidatNom }}</h5>
+                <p class="cv-email">{{ cv.candidatEmail }}</p>
+                <p class="cv-date">Soumis le: {{ cv.dateSoumission | date:'dd/MM/yyyy' }}</p>
+                <p class="cv-filename" *ngIf="cv.cvOriginalFilename">
+                  Fichier: {{ cv.cvOriginalFilename }}
+                </p>
+              </div>
+            </div>
+            <div class="cv-actions">
+              <button 
+                class="btn btn-small" 
+                (click)="analyzeLinkedCv(cv.id)"
+                [disabled]="loading">
+                🔍 Analyser
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Message si aucun CV lié -->
+      <div *ngIf="!loadingLinkedCvs && linkedCvs.length === 0" class="no-linked-cvs">
+        <p>📝 Aucun CV n'est actuellement lié à cette offre.</p>
+      </div>
+
+      <!-- Actions pour les CVs existants -->
+      <div class="actions existing-actions">
+        <button 
+          class="btn btn-secondary" 
+          (click)="matchExistingCvs()" 
+          [disabled]="!selectedOffre || loading">
+          <span *ngIf="loading" class="btn-spinner"></span>
+          {{ loading ? '⏳ Chargement...' : '📊 Analyser tous les CVs existants' }}
+        </button>
+      </div>
     </div>
 
-    <!-- Actions -->
-    <div class="actions">
-      <button 
-        class="btn btn-primary" 
-        (click)="uploadAndMatch()" 
-        [disabled]="!selectedOffre || selectedFiles.length === 0 || uploading">
-        <span *ngIf="uploading" class="btn-spinner"></span>
-        {{ uploading ? '⏳ Analyse en cours...' : '🚀 Analyser les CVs' }}
-      </button>
-
-      <button 
-        class="btn btn-secondary" 
-        (click)="matchExistingCvs()" 
-        [disabled]="!selectedOffre || loading">
-        <span *ngIf="loading" class="btn-spinner"></span>
-        {{ loading ? '⏳ Chargement...' : '📊 Analyser CVs existants' }}
-      </button>
-
+    <!-- Actions générales -->
+    <div class="actions general-actions">
       <button class="btn btn-outline" (click)="clearSelection()">
-        🗑️ Réinitialiser
+        🗑️ Tout réinitialiser
       </button>
     </div>
   </div>
@@ -135,40 +217,74 @@
         <button class="btn btn-download" (click)="downloadResults()">
           📥 Exporter CSV
         </button>
+        <button class="btn btn-outline" (click)="clearResults()">
+          🗑️ Effacer les résultats
+        </button>
       </div>
     </div>
 
     <div class="results-grid">
       <div *ngFor="let result of matchingResults; let i = index" class="result-card">
+        
+        <!-- En-tête avec nom et score -->
         <div class="card-header">
           <div class="card-rank">#{{ i + 1 }}</div>
-          <h4>{{ result.filename }}</h4>
-          <span class="score-badge" [class]="getScoreClass(result.score_overall)">
+          <h4>{{ result.filename || (result.candidatPrenom + ' ' + result.candidatNom) || 'CV sans nom' }}</h4>
+          <span *ngIf="result.score_overall !== undefined && result.score_overall !== null" 
+                class="score-badge" 
+                [class]="getScoreClass(result.score_overall)">
             {{ result.score_overall * 100 | number:'1.0-0' }}%
           </span>
+          <span *ngIf="result.score_overall === undefined || result.score_overall === null" 
+                class="score-badge score-poor">
+            N/A
+          </span>
+          <span class="result-source" *ngIf="result.candidatureId">
+            📁 Base de données
+          </span>
+          <span class="result-source" *ngIf="!result.candidatureId">
+            📤 Uploadé
+          </span>
+          <!-- dans .result-card header, à côté du score -->
+<label class="checkline" *ngIf="result.candidatureId">
+  <input
+    type="checkbox"
+    [checked]="selectedMap[result.candidatureId]"
+    (change)="toggleSelect(result, i)"
+  />
+  ✔️ Check
+</label>
+
         </div>
 
-       <div class="candidate-info">
-  <div class="info-item">
-    <span class="info-icon">📧</span>
-    <span>{{ result.cv_extracted?.email || 'Non disponible' }}</span>
-  </div>
-  <div class="info-item">
-    <span class="info-icon">📞</span>
-    <span>{{ result.cv_extracted?.phone || 'Non disponible' }}</span>
-  </div>
-  <div class="info-item">
-    <span class="info-icon">⏳</span>
-    <span>{{ (result.cv_extracted?.years_experience ?? 0) }} ans d'expérience</span>
-  </div>
-  <div class="info-item">
-    <span class="info-icon">📍</span>
-    <span>{{ result.cv_extracted?.location || 'Non spécifiée' }}</span>
-  </div>
-</div>
+        <!-- Informations candidat -->
+        <div class="candidate-info">
+          <div class="info-item" *ngIf="result.cv_extracted?.email || result.candidatEmail">
+            <span class="info-icon">📧</span>
+            <span>{{ result.cv_extracted.email || result.candidatEmail || 'Non disponible' }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.cv_extracted?.phone">
+            <span class="info-icon">📞</span>
+            <span>{{ result.cv_extracted.phone }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.cv_extracted?.years_experience !== undefined">
+            <span class="info-icon">⏳</span>
+            <span>{{ result.cv_extracted.years_experience }} ans d'expérience</span>
+          </div>
+          <div class="info-item" *ngIf="result.cv_extracted?.location">
+            <span class="info-icon">📍</span>
+            <span>{{ result.cv_extracted.location }}</span>
+          </div>
+        </div>
 
+        <!-- Message d'erreur -->
+        <div *ngIf="result.error" class="error-message">
+          <span class="error-icon">❌</span>
+          <span>Erreur d'analyse: {{ result.error }}</span>
+        </div>
 
-        <div class="skills-section">
+        <!-- Compétences correspondantes -->
+        <div class="skills-section" *ngIf="result.cv_extracted?.skills && result.cv_extracted.skills.length > 0">
           <h5>✅ Compétences correspondantes</h5>
           <div class="skills-list">
             <span *ngFor="let skill of result.cv_extracted.skills" class="skill-tag matched">
@@ -177,7 +293,8 @@
           </div>
         </div>
 
-        <div *ngIf="result.missing_skills.length > 0" class="skills-section">
+        <!-- Compétences manquantes -->
+        <div class="skills-section" *ngIf="result.missing_skills && result.missing_skills.length > 0">
           <h5>❌ Compétences manquantes</h5>
           <div class="skills-list">
             <span *ngFor="let skill of result.missing_skills" class="skill-tag missing">
@@ -186,30 +303,35 @@
           </div>
         </div>
 
-        <div class="criteria-scores">
+        <!-- Détail des scores -->
+        <div class="criteria-scores" *ngIf="result.criteria">
           <h5>📈 Détail des scores</h5>
-          <div class="score-item">
+          
+          <div class="score-item" *ngIf="result.criteria.title_match !== undefined">
             <span class="score-label">Titre</span>
             <span class="score-value">{{ result.criteria.title_match * 100 | number:'1.0-0' }}%</span>
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="result.criteria.title_match * 100"></div>
             </div>
           </div>
-          <div class="score-item">
+          
+          <div class="score-item" *ngIf="result.criteria.skills_match !== undefined">
             <span class="score-label">Compétences</span>
             <span class="score-value">{{ result.criteria.skills_match * 100 | number:'1.0-0' }}%</span>
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="result.criteria.skills_match * 100"></div>
             </div>
           </div>
-          <div class="score-item">
+          
+          <div class="score-item" *ngIf="result.criteria.experience_match !== undefined">
             <span class="score-label">Expérience</span>
             <span class="score-value">{{ result.criteria.experience_match * 100 | number:'1.0-0' }}%</span>
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="result.criteria.experience_match * 100"></div>
             </div>
           </div>
-          <div class="score-item">
+          
+          <div class="score-item" *ngIf="result.criteria.location_match !== undefined">
             <span class="score-label">Localisation</span>
             <span class="score-value">{{ result.criteria.location_match * 100 | number:'1.0-0' }}%</span>
             <div class="progress-bar">

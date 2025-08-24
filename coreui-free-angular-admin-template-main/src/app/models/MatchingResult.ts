@@ -20,5 +20,11 @@ export interface MatchingResult {
     years_experience?: number | null;
     location?: string | null;
     raw_text_chars: number;
+    
   };
+  candidatNom?: string;
+  candidatPrenom?: string;
+  candidatEmail?: string;
+  candidatureId?: number;
+  error?: string; // Ajouter cette propriété
 }

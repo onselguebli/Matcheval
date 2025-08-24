@@ -26,10 +26,16 @@ export const navItemsRecruiter: INavData[] = [
     url: '/recruiter-dashboard/pages_recruteur/liste-offre',
    iconComponent: { name: 'cil-list-rich' }
   },
+
    {
     name: 'cv-matching',
     url: '/recruiter-dashboard/pages_recruteur/cv-matching',
    iconComponent: { name: 'cil-user-follow' }
+  },
+   {
+    name: 'liste_selectionnées',
+    url: '/recruiter-dashboard/ckecked-list',
+   iconComponent: { name: 'cil-list' }
   },
   
   {

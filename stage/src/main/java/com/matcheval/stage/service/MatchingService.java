@@ -13,8 +13,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,6 +30,7 @@ public class MatchingService {
     OffreRepo offreRepository;
     @Autowired
     CandidatureRepo candidatureRepository;
+
     private final RestTemplate restTemplate;
 
     private final String FASTAPI_URL = "http://localhost:8000";
@@ -104,43 +110,88 @@ public class MatchingService {
         jobData.put("location", offre.getLocalisation());
         jobData.put("languages_required", Arrays.asList("french", "english"));
 
-        // Préparer le CV (utiliser le texte extrait si disponible)
-        String cvText = cand.getCv().getContenuTexte();
-        if (cvText == null || cvText.trim().isEmpty()) {
-            cvText = "CV content not available";
-        }
+        // Créer un MultipartFile à partir des données binaires du CV
+        MultipartFile cvFile = createMultipartFileFromBytes(
+                cand.getCv().getData(),
+                cand.getCv().getOriginalFilename(),
+                cand.getCv().getContentType()
+        );
 
-        Map<String, Object> cvData = new HashMap<>();
-        cvData.put("filename", cand.getCv().getOriginalFilename());
-        cvData.put("text", cvText);
-        cvData.put("skills", extractSkillsFromText(cvText));
-
-        // Appeler FastAPI (version simplifiée pour le texte)
+        // Envoyer à FastAPI avec le format attendu
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        Map<String, Object> request = new HashMap<>();
-        request.put("job", jobData);
-        request.put("cv", cvData);
+        var bodyBuilder = new MultipartBodyBuilder();
+        bodyBuilder.part("files", cvFile.getResource());
+        bodyBuilder.part("job_json", jobData);
 
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(request, headers);
+        HttpEntity<?> requestEntity = new HttpEntity<>(bodyBuilder.build(), headers);
 
         ResponseEntity<Map> response = restTemplate.exchange(
-                FASTAPI_URL + "/match-text",
+                FASTAPI_URL + "/match-multiple",
                 HttpMethod.POST,
                 requestEntity,
                 Map.class
         );
 
         Map<String, Object> result = response.getBody();
-        result.put("candidatureId", cand.getId());
-        result.put("candidatNom", cand.getCandidatNom());
-        result.put("candidatPrenom", cand.getCandidatPrenom());
-        result.put("candidatEmail", cand.getCandidatEmail());
+        // Extraire le premier résultat (puisqu'on envoie un seul CV)
+        if (result != null && result.containsKey("results") && ((List<?>) result.get("results")).size() > 0) {
+            Map<String, Object> firstResult = (Map<String, Object>) ((List<?>) result.get("results")).get(0);
+            firstResult.put("candidatureId", cand.getId());
+            firstResult.put("candidatNom", cand.getCandidatNom());
+            firstResult.put("candidatPrenom", cand.getCandidatPrenom());
+            firstResult.put("candidatEmail", cand.getCandidatEmail());
+            return firstResult;
+        }
 
-        return result;
+        return Map.of("error", "No matching results", "candidatureId", cand.getId());
     }
 
+    // Méthode utilitaire pour créer un MultipartFile à partir de bytes
+    private MultipartFile createMultipartFileFromBytes(byte[] data, String filename, String contentType) {
+        return new MultipartFile() {
+            @Override
+            public String getName() {
+                return "file";
+            }
+
+            @Override
+            public String getOriginalFilename() {
+                return filename;
+            }
+
+            @Override
+            public String getContentType() {
+                return contentType;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return data == null || data.length == 0;
+            }
+
+            @Override
+            public long getSize() {
+                return data != null ? data.length : 0;
+            }
+
+            @Override
+            public byte[] getBytes() throws IOException {
+                return data != null ? data : new byte[0];
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return new ByteArrayInputStream(data != null ? data : new byte[0]);
+            }
+
+            @Override
+            public void transferTo(File dest) throws IOException, IllegalStateException {
+                Files.write(dest.toPath(), data != null ? data : new byte[0]);
+            }
+        };
+    }
     private List<String> extractSkillsFromText(String text) {
         if (text == null) return Arrays.asList();
 
@@ -169,4 +220,72 @@ public class MatchingService {
         }
         return 0;
     }
+
+    public List<Map<String, Object>> matchSelectedCvsWithOffre(Long offreId, List<Long> candidatureIds) {
+        OffreEmploi offre = offreRepository.findById(offreId)
+                .orElseThrow(() -> new RuntimeException("Offre non trouvée"));
+
+        List<Map<String, Object>> results = new ArrayList<>();
+
+        for (Long candId : candidatureIds) {
+            Candidature cand = candidatureRepository.findById(candId)
+                    .orElseThrow(() -> new RuntimeException("Candidature non trouvée: " + candId));
+
+            if (cand.getCv() != null && cand.getCv().getData() != null) {
+                try {
+                    Map<String, Object> matchResult = matchExistingCvWithOffre(offre, cand);
+                    results.add(matchResult);
+                } catch (Exception e) {
+                    Map<String, Object> errorResult = new HashMap<>();
+                    errorResult.put("candidatureId", cand.getId());
+                    errorResult.put("error", e.getMessage());
+                    errorResult.put("score", 0.0);
+                    results.add(errorResult);
+                }
+            }
+        }
+
+        results.sort((a, b) -> Double.compare(
+                (Double) b.getOrDefault("score", 0.0),
+                (Double) a.getOrDefault("score", 0.0)
+        ));
+
+        return results;
+    }
+    public Map<String, Object> matchSpecificCv(Long candidatureId) {
+        Candidature cand = candidatureRepository.findById(candidatureId)
+                .orElseThrow(() -> new RuntimeException("Candidature non trouvée: " + candidatureId));
+
+        if (cand.getOffre() == null) {
+            throw new RuntimeException("Aucune offre associée à cette candidature");
+        }
+
+        return matchExistingCvWithOffre(cand.getOffre(), cand);
+    }
+
+    ////////pour selectionner et afficher les cv de score high :
+    // Dans MatchingService.java
+    public Map<String, Object> matchSpecificCvWithDetails(Long candidatureId) {
+        Candidature cand = candidatureRepository.findById(candidatureId)
+                .orElseThrow(() -> new RuntimeException("Candidature non trouvée: " + candidatureId));
+
+        if (cand.getOffre() == null) {
+            throw new RuntimeException("Aucune offre associée à cette candidature");
+        }
+
+        Map<String, Object> result = matchExistingCvWithOffre(cand.getOffre(), cand);
+
+        // Ajouter des informations supplémentaires
+        result.put("candidatureId", cand.getId());
+        result.put("candidatNom", cand.getCandidatNom());
+        result.put("candidatPrenom", cand.getCandidatPrenom());
+        result.put("candidatEmail", cand.getCandidatEmail());
+        result.put("dateSoumission", cand.getDateSoumission());
+        result.put("offreId", cand.getOffre().getId());
+        result.put("offreTitre", cand.getOffre().getTitre());
+
+        return result;
+    }
+
+
 }

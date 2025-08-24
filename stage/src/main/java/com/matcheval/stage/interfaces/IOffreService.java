@@ -8,7 +8,6 @@ import com.matcheval.stage.model.Users;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
-import java.util.Map;
 
 public interface IOffreService {
     boolean diffuserOffre(OffreEmploi offre, SiteExterne site);
