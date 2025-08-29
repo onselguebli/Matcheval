@@ -57,6 +57,11 @@ public interface UserRepo extends JpaRepository<Users,Long> {
     List<Object[]> countRecruteursByYear();
 
     Long countByLastLoginBetween(LocalDateTime start, LocalDateTime end);
+    @Query("""
+  select count(u) from Users u
+  where u.manager.email = :managerEmail and u.role = com.matcheval.stage.model.Roles.RECRUITER
+""")
+    long countRecruitersOf(String managerEmail);
 
 
 

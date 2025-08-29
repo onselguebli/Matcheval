@@ -1,5 +1,6 @@
 package com.matcheval.stage.controller;
 
+import com.matcheval.stage.dto.CanDTO;
 import com.matcheval.stage.dto.OffreEmploiDTO;
 import com.matcheval.stage.model.OffreEmploi;
 import com.matcheval.stage.model.Users;
@@ -52,7 +53,15 @@ public class OffreController {
         OffreEmploiDTO updated = offreService.modifierOffreEtSynchroniser(id, dto);
         return ResponseEntity.ok(updated);
     }
-
+    @GetMapping("/{offreId}/candidatures")
+    public ResponseEntity<List<CanDTO>> getCandidaturesForOffre(@PathVariable Long offreId) {
+        try {
+            List<CanDTO> candidatures = offreService.getCandidaturesForOffre(offreId);
+            return ResponseEntity.ok(candidatures);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
 }
 

@@ -8,7 +8,7 @@ import { OffreEmploi } from '../../models/OffreEmploi';
 import { lastValueFrom } from 'rxjs';
 import { MatchingResult } from '../../models/MatchingResult';
 import { Candidature } from '../../models/candidature';
-
+import { ToastService } from '../../services/toast.service';
 
 
 @Component({
@@ -35,7 +35,8 @@ export class CvMatchingComponent implements OnInit {
   constructor(
     private matchingService: CvMatchingServiceService,
     private userService: UserserviceService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toast: ToastService              
   ) {}
 
   hasId(obj: any): obj is { id: number } {
@@ -66,6 +67,7 @@ export class CvMatchingComponent implements OnInit {
       error: (error: any) => {
         console.error('Erreur chargement offres:', error);
         this.error = 'Erreur lors du chargement des offres';
+        this.toast.showError(this.error);
         this.loadingOffres = false;
       }
     });
@@ -76,6 +78,7 @@ export class CvMatchingComponent implements OnInit {
     this.selectedOffre = this.offres.find(o => o.id === Number(offreId)) || null;
     if (!this.hasId(this.selectedOffre)) {
       this.error = 'Veuillez sélectionner une offre d\'emploi';
+      this.toast.showError(this.error);
       return;
     }
     if (this.selectedOffre) {
@@ -90,17 +93,20 @@ export class CvMatchingComponent implements OnInit {
     this.selectedFiles = Array.from(files);
     
     this.success = `${this.selectedFiles.length} fichier(s) sélectionné(s)`;
+    this.toast.showSuccess(this.success);
     setTimeout(() => this.success = null, 3000);
   }
 
   async uploadAndMatch(): Promise<void> {
     if (!this.hasId(this.selectedOffre)) {
       this.error = 'Veuillez sélectionner une offre d\'emploi';
+      this.toast.showError("Veuillez sélectionner une offre d\'emploi");
       return;
     }
     
     if (this.selectedFiles.length === 0) {
       this.error = 'Veuillez sélectionner au moins un CV';
+      this.toast.showError("VVeuillez sélectionner au moins un CV'");
       return;
     }
 
@@ -117,10 +123,13 @@ export class CvMatchingComponent implements OnInit {
 
       const results = await Promise.all(uploadPromises);
       this.matchingResults = results.filter(result => result !== undefined);
-      this.success = `Analyse terminée pour ${this.matchingResults.length} CV(s)`;
-    } catch (error: any) {
-      console.error('Erreur matching:', error);
-      this.error = error.message || 'Erreur lors de l\'analyse des CVs';
+       const ok = `Analyse terminée pour ${this.matchingResults.length} CV(s)`;
+    this.success = ok;
+    this.toast.showSuccess(ok);
+    } catch (e: any) {
+      const msg = e?.message || 'Erreur lors de l\'analyse des CVs';
+      this.error = msg;
+      this.toast.showError(msg); 
     } finally {
       this.uploading = false;
       this.loading = false;
@@ -129,7 +138,7 @@ export class CvMatchingComponent implements OnInit {
 
   matchExistingCvs(): void {
     if (!this.hasId(this.selectedOffre)) {
-      this.error = 'Veuillez sélectionner une offre d\'emploi';
+      this.toast.showError( 'Veuillez sélectionner une offre d\'emploi');
       return;
     }
 
@@ -142,10 +151,12 @@ export class CvMatchingComponent implements OnInit {
         this.matchingResults = results;
         this.loading = false;
         this.success = `Analyse terminée pour ${results.length} CV(s) existants`;
+        this.toast.showSuccess(this.success);
       },
       error: (error: any) => {
         console.error('Erreur matching CVs existants:', error);
         this.error = 'Erreur lors de l\'analyse des CVs existants';
+        this.toast.showError(this.error);
         this.loading = false;
       }
     });
@@ -154,6 +165,7 @@ export class CvMatchingComponent implements OnInit {
   downloadResults(): void {
     if (this.matchingResults.length === 0) {
       this.error = 'Aucun résultat à exporter';
+      this.toast.showError(this.error);
       return;
     }
 
@@ -235,6 +247,7 @@ export class CvMatchingComponent implements OnInit {
       error: (error: any) => {
         console.error('Erreur chargement CVs liés:', error);
         this.error = 'Erreur lors du chargement des CVs liés';
+        this.toast.showError(this.error);
         this.loadingLinkedCvs = false;
       }
     });
@@ -245,6 +258,7 @@ export class CvMatchingComponent implements OnInit {
 analyzeLinkedCv(candidatureId: number): void {
   if (!this.hasId(this.selectedOffre)) {
     this.error = 'Veuillez sélectionner une offre d\'emploi';
+    this.toast.showError(this.error);
     return;
   }
 
@@ -255,10 +269,12 @@ analyzeLinkedCv(candidatureId: number): void {
       this.matchingResults = [result, ...this.matchingResults];
       this.loading = false;
       this.success = 'Analyse du CV terminée';
+      this.toast.showSuccess(this.success);
     },
     error: (error: any) => {
       console.error('Erreur analyse CV lié:', error);
       this.error = 'Erreur lors de l\'analyse du CV';
+      this.toast.showError(this.error);
       this.loading = false;
     }
   });
@@ -268,6 +284,7 @@ analyzeLinkedCv(candidatureId: number): void {
   analyzeAllLinkedCvs(): void {
     if (!this.hasId(this.selectedOffre)) {
       this.error = 'Veuillez sélectionner une offre d\'emploi';
+      this.toast.showError(this.error);
       return;
     }
     this.loading = true;
@@ -276,10 +293,12 @@ analyzeLinkedCv(candidatureId: number): void {
         this.matchingResults = results;
         this.loading = false;
         this.success = `Analyse terminée pour ${results.length} CV(s) liés`;
+        this.toast.showSuccess(this.success);
       },
       error: (error: any) => {
         console.error('Erreur analyse CVs liés:', error);
         this.error = 'Erreur lors de l\'analyse des CVs liés';
+        this.toast.showError(this.error);
         this.loading = false;
       }
     });
@@ -290,12 +309,14 @@ clearUploadedFiles(): void {
   const fileInput = document.getElementById('cvFiles') as HTMLInputElement;
   if (fileInput) fileInput.value = '';
   this.success = 'Fichiers uploadés effacés';
+  this.toast.showSuccess(this.success);
   setTimeout(() => this.success = null, 3000);
 }
 
 clearResults(): void {
   this.matchingResults = [];
   this.success = 'Résultats effacés';
+  this.toast.showSuccess(this.success);
   setTimeout(() => this.success = null, 3000);
 }
 //la partie de selectionner les cvs scorés
@@ -317,24 +338,28 @@ clearResults(): void {
 async checkSelected(): Promise<void> {
   if (!this.hasId(this.selectedOffre)) {
     this.error = 'Veuillez sélectionner une offre d\'emploi';
+    this.toast.showError(this.error);
     return;
   }
 
   const offreId = this.selectedOffre?.id;
   if (typeof offreId !== 'number') {
     this.error = 'Offre invalide (id manquant).';
+    this.toast.showError(this.error);
     return;
   }
 
   const recruteurEmail = this.authService.getRecruteurEmail();
   if (!recruteurEmail) {
     this.error = 'Impossible de déterminer votre email (token manquant).';
+    this.toast.showError(this.error);
     return;
   }
 
   const items = Object.values(this.selectedMap);
   if (items.length === 0) {
     this.error = 'Sélection vide (seuls les CV liés peuvent être cochés).';
+    this.toast.showError(this.error);
     return;
   }
 
@@ -351,10 +376,12 @@ async checkSelected(): Promise<void> {
     );
     await Promise.all(calls.map(o => lastValueFrom(o)));
     this.success = 'Sélection enregistrée ✅';
+    this.toast.showSuccess(this.success);
     this.selectedMap = {};
   } catch (e:any) {
     console.error(e);
     this.error = 'Erreur lors de l’enregistrement de la sélection';
+    this.toast.showError(this.error);
   } finally {
     this.loading = false;
   }

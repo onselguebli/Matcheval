@@ -1,0 +1,16 @@
+/* src/app/checkedlist/manager-checked-list/manager-checked-list.component.scss */
+@use '../checked-list/checked-list.component' as *;
+// si tu veux réutiliser
+
+
+.group { border:1px solid #eef2f7; border-radius:14px; margin:12px 0; overflow:hidden; background:#fff; }
+.group__header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 12px; background:#f8fafc; cursor:pointer;
+}
+.group__title { display:flex; align-items:center; gap:8px; }
+.icon { transition: transform .15s ease; display:inline-block; }
+.icon.open { transform: rotate(90deg); }
+.count { background:#eef2ff; color:#3730a3; font-weight:700; padding:2px 8px; border-radius:999px; font-size:12px; }
+.group__body { padding:8px 12px; }
+.btn--ghost { background:transparent; border:1px dashed #d0d5dd; }

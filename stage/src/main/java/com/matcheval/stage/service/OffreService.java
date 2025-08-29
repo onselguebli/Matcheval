@@ -1,5 +1,6 @@
 package com.matcheval.stage.service;
 
+import com.matcheval.stage.dto.CanDTO;
 import com.matcheval.stage.dto.CandidatureExterne;
 import com.matcheval.stage.dto.OffreEmploiDTO;
 import com.matcheval.stage.dto.OffreWithCandidaturesDTO;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -299,5 +301,41 @@ public class OffreService implements IOffreService {
         return dto;
     }
 
+    public List<CanDTO> getCandidaturesForOffre(Long offreId) {
+        List<Candidature> candidatures = candidatureRepo.findByOffreId(offreId);
 
+        return candidatures.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    private CanDTO convertToDTO(Candidature candidature) {
+        CanDTO dto = new CanDTO();
+        dto.setId(candidature.getId());
+        dto.setDateSoumission(candidature.getDateSoumission());
+        dto.setStatut(candidature.getStatut());
+        dto.setCommentaire(candidature.getCommentaire());
+        dto.setCandidatNom(candidature.getCandidatNom());
+        dto.setCandidatPrenom(candidature.getCandidatPrenom());
+        dto.setCandidatEmail(candidature.getCandidatEmail());
+
+        // Informations sur le CV
+        if (candidature.getCv() != null) {
+            CV cv = candidature.getCv();
+            dto.setCvOriginalFilename(cv.getOriginalFilename());
+            dto.setCvContentType(cv.getContentType());
+            dto.setCvSize(cv.getSize());
+            dto.setCvDateUpload(cv.getDateUpload() != null ?
+                    cv.getDateUpload().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime() : null);
+            dto.setCvContenuTexte(cv.getContenuTexte());
+            dto.setHasCvText(cv.getContenuTexte() != null && !cv.getContenuTexte().trim().isEmpty());
+        }
+
+        // Informations sur l'offre
+        if (candidature.getOffre() != null) {
+            dto.setOffreId(candidature.getOffre().getId());
+            dto.setOffreTitre(candidature.getOffre().getTitre());
+        }
+
+        return dto;
+    }
 }

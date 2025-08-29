@@ -37,7 +37,20 @@ getRecruteurEmail(): string | null {
   return null;
 }
 
-
+getManagerEmail(): string | null {
+  const token = this.getToken();
+  if (token) {
+    const decoded = jwtDecode<DecodedToken>(token);
+    
+    // Si l'utilisateur est un manager, retourner son email
+    if (decoded.role === 'ROLE_MANAGER') {
+      return decoded.sub ?? null;
+    }
+    
+    // Si vous avez besoin de gérer d'autres cas, ajoutez-les ici
+  }
+  return null;
+}
 getUsername(): string | null {
   const token = this.getToken();
   if (!token) return null;

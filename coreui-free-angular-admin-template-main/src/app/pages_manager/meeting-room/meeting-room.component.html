@@ -1,0 +1,47 @@
+<!-- src/app/manager/meeting-room/meeting-room.component.html -->
+<div class="meeting-page">
+  <h2>🧑‍💼 Salle de réunion</h2>
+
+  <form (ngSubmit)="createMeeting()" class="create-form">
+    <label>Titre</label>
+    <input [(ngModel)]="form.title" name="title" required>
+
+    <label>Date/heure (optionnel)</label>
+    <input [(ngModel)]="form.startAt" name="startAt" type="datetime-local">
+
+    <label>Durée (min)</label>
+    <input [(ngModel)]="form.durationMin" name="durationMin" type="number" min="5">
+
+    <label>Mot de passe (optionnel)</label>
+    <input [(ngModel)]="form.password" name="password" placeholder="Ex: 1234">
+
+    <button type="submit">➕ Créer & rejoindre</button>
+  </form>
+
+  <div class="list">
+    <h3>Mes réunions</h3>
+    <div *ngIf="loading">Chargement…</div>
+    <div *ngIf="!loading && meetings.length === 0">Aucune réunion.</div>
+
+    <div *ngFor="let m of meetings" class="meeting-item">
+      <div>
+        <div class="title">{{ m.title }}</div>
+        <div class="meta">
+          Salle: <code>{{ m.roomName }}</code> &nbsp;•&nbsp;
+          Début: {{ m.startAt | date:'short' }}
+        </div>
+      </div>
+      <div class="actions">
+        <button (click)="join(m)">Rejoindre</button>
+        <a [href]="'https://meet.jit.si/'+m.roomName" target="_blank">Lien invité</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="jitsi-container" class="jitsi-frame"></div>
+
+  <div class="alerts">
+    <div *ngIf="error" class="error">{{ error }}</div>
+    <div *ngIf="success" class="success">{{ success }}</div>
+  </div>
+</div>

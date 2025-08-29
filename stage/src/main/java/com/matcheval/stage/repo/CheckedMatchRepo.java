@@ -11,20 +11,38 @@ public interface CheckedMatchRepo extends JpaRepository<CheckedMatch, Long> {
     // Liste du recruteur par email
     List<CheckedMatch> findByRecruteur_EmailOrderByCreatedAtDesc(String email);
 
-    // Vue manager : tous les checks des recruteurs rattachés à ce manager (filtrés par email du manager)
     @Query("""
-    SELECT cm FROM CheckedMatch cm
-    WHERE cm.manager.email = :managerEmail
-    ORDER BY cm.createdAt DESC
+    select cm from CheckedMatch cm
+    where cm.manager.email = :managerEmail
+    order by cm.createdAt desc
   """)
     List<CheckedMatch> findAllForManagerEmail(String managerEmail);
 
-    // Vue manager + filtre sur un recruteur précis (par email)
     @Query("""
-    SELECT cm FROM CheckedMatch cm
-    WHERE cm.manager.email = :managerEmail
-      AND cm.recruteur.email = :recruteurEmail
-    ORDER BY cm.createdAt DESC
+    select cm from CheckedMatch cm
+    where cm.manager.email = :managerEmail
+      and cm.recruteur.email = :recruteurEmail
+    order by cm.createdAt desc
   """)
     List<CheckedMatch> findAllForManagerAndRecruteurEmail(String managerEmail, String recruteurEmail);
+
+    // ✅ Postgres-safe: on passe un since (LocalDateTime) en paramètre
+    @Query("""
+    select count(cm) from CheckedMatch cm
+    where cm.recruteur.manager.email = :managerEmail
+      and cm.createdAt >= :since
+  """)
+    long countLast30ForManagerSince(String managerEmail, java.time.LocalDateTime since);
+
+    // ✅ Top recruteurs: préfère la pagination plutôt que LIMIT :limit
+    @Query(value = """
+    select r.email, count(*) as cnt
+    from checked_match cm
+    join users r on cm.recruteur_id = r.id
+    join users m on r.manager_id = m.id
+    where m.email = :managerEmail
+    group by r.email
+    order by cnt desc
+  """, nativeQuery = true)
+    List<Object[]> topRecruitersByChecked(String managerEmail, org.springframework.data.domain.Pageable pageable);
 }

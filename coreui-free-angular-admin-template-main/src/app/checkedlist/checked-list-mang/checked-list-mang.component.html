@@ -1,0 +1,67 @@
+<!-- src/app/checkedlist/manager-checked-list/manager-checked-list.component.html -->
+<div class="panel">
+  <div class="panel__header">
+    <div class="title">
+      <span class="emoji">🗃️</span>
+      <h2>CV cochés (manager)</h2>
+    </div>
+    <div class="toolbar">
+      <input class="input" type="email" [(ngModel)]="filterRecruteurEmail" placeholder="Filtrer par recruteur (email)" />
+      <button class="btn" (click)="load()">Filtrer</button>
+      <button class="btn" (click)="filterRecruteurEmail=''; load()">Réinitialiser</button>
+
+      <select class="select" (change)="onSortChange($event)">
+        <option value="date" selected>Trier par date</option>
+        <option value="score">Trier par score</option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading"><div class="spinner"></div>Chargement...</div>
+  <div *ngIf="error" class="alert alert--error">{{ error }}</div>
+
+  <div *ngIf="!loading && groups.length === 0" class="empty">
+    <span class="emoji">🫙</span>
+    <p>Aucun élément</p>
+  </div>
+
+  <div class="group" *ngFor="let g of groups">
+    <div class="group__header" (click)="toggle(g)">
+      <div class="group__title">
+        <span class="icon" [class.open]="g.open">▸</span>
+        <strong>{{ g.email }}</strong>
+        <span class="count">{{ g.items.length }}</span>
+      </div>
+      <button class="btn btn--ghost" (click)="$event.stopPropagation(); load()">⟳</button>
+    </div>
+
+    <div class="group__body" *ngIf="g.open">
+      <div class="tablewrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Offre</th>
+              <th>Candidat</th>
+              <th>Email</th>
+              <th>Score</th>
+              <th>Créé le</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let it of g.items">
+              <td class="mono">#{{ it.offreId || '-' }} — {{ it.offreTitre || '-' }}</td>
+              <td>{{ (it.candidatPrenom || '') + ' ' + (it.candidatNom || '') }}</td>
+              <td class="mono">{{ it.candidatEmail || '-' }}</td>
+              <td><span [class]="scoreClass(it.scoreOverall)">{{ ((it.scoreOverall ?? 0) * 100) | number:'1.0-0' }}%</span></td>
+              <td>{{ it.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="actions">
+                <button class="btn btn--danger" (click)="delete(it.id)" title="Supprimer">🗑️</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

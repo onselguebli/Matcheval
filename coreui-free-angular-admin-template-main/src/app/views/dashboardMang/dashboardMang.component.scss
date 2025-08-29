@@ -1,102 +1,76 @@
-:host {
-  .legend {
-    small {
-      font-size: x-small;
-    }
+/* ====== layout ====== */
+.dashboard { padding: 1.25rem; }
+
+.dash-header{
+  display:flex; align-items:center; justify-content:space-between; gap:.75rem; margin-bottom:1rem;
+  .dash-title{ display:flex; align-items:center; gap:.5rem; font-weight:800; }
+  .dash-actions{ display:flex; gap:.5rem; }
+  .year-select{ width:140px; }
+}
+
+/* ====== KPI grid ====== */
+.widgets{
+  display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: .9rem; margin-bottom:1.25rem;
+}
+.widget{
+  display:flex; align-items:center; gap:.75rem;
+  background: var(--cui-body-bg, #fff);
+  border: 1px solid var(--cui-border-color, #e7eaef);
+  border-radius: 16px;
+  padding: .9rem 1rem;
+  box-shadow: 0 6px 16px rgba(17,24,39,.05);
+  transition: transform .2s ease, box-shadow .2s ease;
+  &:hover{ transform: translateY(-2px); box-shadow: 0 10px 22px rgba(17,24,39,.07); }
+}
+.kpi-icon{
+  display:grid; place-items:center; width:44px; height:44px; border-radius:12px;
+  background: rgba(99,102,241,.12);
+  color:#6366F1; font-size:1.15rem;
+}
+.kpi .title{ display:block; font-size:.85rem; color:var(--cui-secondary-color, #64748b); }
+.kpi .val{ font-size:1.5rem; font-weight:800; color: var(--cui-body-color, #0f172a); }
+
+/* ====== cards & grid ====== */
+.grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(360px,1fr)); gap:1rem; }
+
+.card{
+  background: var(--cui-body-bg, #fff);
+  border:1px solid var(--cui-border-color, #e7eaef);
+  border-radius:16px; padding:0; overflow:hidden;
+  box-shadow: 0 6px 16px rgba(17,24,39,.05);
+}
+.card-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.9rem 1rem; border-bottom:1px solid var(--cui-border-color, #eef2f7);
+  h4{ margin:0; font-weight:700; }
+}
+.chart-card .chart-box{ padding:.75rem 1rem 1rem; height: 320px; }
+.chart-card c-chart{ display:block; height:100%; }
+
+/* ====== table look ====== */
+.top-card .table-wrap{ padding:.75rem 1rem 1rem; }
+.table-modern{
+  width:100%; border-collapse:separate; border-spacing:0 6px;
+  thead th{ font-size:.8rem; color:var(--cui-secondary-color,#64748b); font-weight:700; border:none; }
+  tbody tr{
+    background: var(--cui-body-bg, #fff);
+    border:1px solid var(--cui-border-color, #eef2f7);
+    border-radius:12px; box-shadow: 0 4px 10px rgba(17,24,39,.04);
   }
-}
-.chart-card {
-  width: 340px;
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  tbody td{ border:none; padding:.65rem .75rem; vertical-align:middle; }
+  .truncate{ max-width:320px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 }
 
-.chart-card c-card-body {
-  padding: 1rem;
+/* ====== dark mode (CoreUI/OS) ====== */
+@media (prefers-color-scheme: dark){
+  .widget, .card { box-shadow:none; }
+  .kpi .title{ color:#9ca3af; } .kpi .val{ color:#f9fafb; }
 }
+/* === Forcer la couleur noire en mode clair === */
+.dashboard { color: #000; }               /* couleur par défaut du texte dans la page */
+.dash-header .dash-title { color: #000; } /* titre principal */
 
-.text-center  {
-  padding: 0.75rem 1rem;
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-.table tbody tr:hover {
-  background-color: #f1f1f1;
-  transition: background-color 0.2s ease-in-out;
-}
-
-
-.custom-colored-table tbody tr.top-row-1 {
-  background-color: rgba(54, 185, 204, 0.3);
-  font-weight: 900;
-}
-
-.custom-colored-table tbody tr.top-row-2 {
-  background-color: rgba(54, 185, 204, 0.2);
-  font-weight: 700;
-}
-
-.custom-colored-table tbody tr.top-row-3 {
-  background-color: rgba(54, 185, 204, 0.1);
-  font-weight: 600;
-}
-
-/* Pour préserver le survol (hover) */
-.custom-colored-table.table-hover tbody tr:hover {
-  background-color: rgba(0, 0, 0, 0.075); /* Couleur hover par défaut de Bootstrap */
-}
-.offers-section {
-  margin-top: 20px;
-
-  .section-title {
-    font-weight: bold;
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
-    color: #4b4bff;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-}
-.offer-card {
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  border-radius: 15px;
-  background: linear-gradient(135deg, #5a54f0, #7b6cf6);
-  color: white;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  cursor: pointer;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(90, 84, 240, 0.3);
-  }
-
-  .offer-label {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin-right: 1rem;
-  }
-
-  .offer-content {
-    h5 {
-      font-weight: bold;
-      margin: 0;
-      font-size: 1.1rem;
-    }
-    p {
-      margin: 0;
-      font-size: 0.9rem;
-      opacity: 0.9;
-    }
-  }
-}
+.widget .kpi .title { color: #000 !important; }
+.widget .kpi .val   { color: #000 !important; }
+.card-head h4       { color: #000; }

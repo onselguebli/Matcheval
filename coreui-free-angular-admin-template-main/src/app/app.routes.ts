@@ -16,9 +16,18 @@ export const routes: Routes = [
     data: { expectedRole: 'MANAGER' },
     children: [
       {
-        path: 'ckecked-list',
-      loadComponent: () => import('./checkedlist/checked-list/checked-list.component').then(m => m.CheckedListComponent)
-      }]
+        path: 'ckecked-listMang',
+      loadComponent: () => import('./checkedlist/checked-list-mang/checked-list-mang.component').then(m => m.CheckedListMangComponent)
+      },
+      {
+      path: 'pages_manager',
+      loadChildren: () => import('./pages_manager/routes').then(m => m.routes)
+    },
+   {
+      path: 'dashboardMang',
+      loadChildren: () => import('./views/dashboardMang/routes').then(m => m.routes)
+    }
+  ]
   },
   {
     path: 'recruiter-dashboard',

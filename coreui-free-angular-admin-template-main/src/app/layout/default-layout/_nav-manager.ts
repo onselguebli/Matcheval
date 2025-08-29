@@ -2,14 +2,20 @@ import { INavData } from '@coreui/angular';
 
 export const navItemsManager: INavData[] = [
   {
-    name: 'Accueil Manager',
-    url: '/dashboard',
+    name: 'Accueil Mangaer',
+    url: '/manager-dashboard/dashboardMang',
     iconComponent: { name: 'cil-speedometer' },
-    badge: {
-      color: 'info',
-      text: ''
-    
-    }
+   
+  },
+   {
+    name: 'liste_selectionnées',
+    url: '/manager-dashboard/ckecked-listMang',
+   iconComponent: { name: 'cil-list' }
+  },
+  {
+    name: 'Meetings',
+    url: '/manager-dashboard/pages_manager/Meetings',
+   iconComponent: { name: 'cil-people' }
   },
   {
     title: true,
