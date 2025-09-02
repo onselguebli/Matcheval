@@ -4,26 +4,40 @@ target/
 .idea/
 *.iml
 # Python
-venv/
-.env
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
+*$py.class
 *.so
-*.egg-info/
-.build/
+.Python
+build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Editors/OS
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
-
-# Node (if any)
-node_modules/
-
-# Data / models (track with LFS if needed)
-data/
-models/
+Thumbs.db
 
