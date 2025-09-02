@@ -3,3 +3,27 @@ dist/
 target/
 .idea/
 *.iml
+# Python
+venv/
+.env
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.build/
+dist/
+
+# Editors/OS
+.vscode/
+.idea/
+.DS_Store
+
+# Node (if any)
+node_modules/
+
+# Data / models (track with LFS if needed)
+data/
+models/
+
