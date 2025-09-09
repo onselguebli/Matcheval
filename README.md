@@ -26,7 +26,7 @@ L’objectif est de centraliser la gestion des candidats, recruteurs, managers e
 - Modules utilisés :
   - **Spring Security + JWT** pour l’authentification/autorisation.
   - **Spring Data JPA (Hibernate)** pour la persistance.
-  - **MySQL** comme base de données relationnelle.
+  - **Postgresql** comme base de données relationnelle.
 - Architecture :  
   - `controller/` → APIs REST.  
   - `service/` → logique métier.  
