@@ -95,7 +95,7 @@ public ReqRes login(ReqRes loginRequest) {
             Users user = new Users();
             user.setEmail(registrationRequest.getEmail());
             String rawPassword = registrationRequest.getPassword();
-            user.setPassword(encoder.encode(registrationRequest.getPassword()));
+            user.setPassword( encoder.encode(registrationRequest.getPassword()));
             user.setFirstname(registrationRequest.getFirstname());
             user.setLastname(registrationRequest.getLastname());
             user.setCivility(registrationRequest.getCivility());
