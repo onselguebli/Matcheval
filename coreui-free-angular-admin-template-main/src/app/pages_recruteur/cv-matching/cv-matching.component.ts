@@ -7,7 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { OffreEmploi } from '../../models/OffreEmploi';
 import { lastValueFrom } from 'rxjs';
 import { MatchingResult } from '../../models/MatchingResult';
-import { candidature } from '../../models/candidature';
+import { Candidature } from '../../models/candidature';
 import { ToastService } from '../../services/toast.service';
 
 
@@ -27,7 +27,7 @@ export class CvMatchingComponent implements OnInit {
   loadingOffres = false;
   error: string | null = null;
   success: string | null = null;
-  linkedCvs: candidature[] = [];
+  linkedCvs: Candidature[] = [];
   loadingLinkedCvs = false; 
     selectedMap: Record<string, { candidatureId: number; scoreOverall?: number|null; filenameSnapshot?: string|null }> = {};
 
@@ -240,7 +240,7 @@ export class CvMatchingComponent implements OnInit {
   loadLinkedCvs(offreId: number): void {
     this.loadingLinkedCvs = true;
     this.matchingService.getCandidaturesForOffre(offreId).subscribe({
-      next: (candidatures: candidature[]) => {
+      next: (candidatures: Candidature[]) => {
         this.linkedCvs = candidatures;
         this.loadingLinkedCvs = false;
       },

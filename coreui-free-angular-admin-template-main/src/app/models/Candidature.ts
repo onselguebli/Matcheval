@@ -1,5 +1,5 @@
 // src/app/models/candidature.model.ts
-export interface candidature {
+export interface Candidature {
   id: number;
   dateSoumission: string;
   statut: string;

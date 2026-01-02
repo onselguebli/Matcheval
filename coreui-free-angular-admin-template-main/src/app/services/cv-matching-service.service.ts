@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { MatchingApiResponse } from '../models/MatchingApiResponse';
 import { MatchingResult } from '../models/MatchingResult';
 import { AuthService } from './auth.service';
-import { candidature } from '../models/candidature';
+import { Candidature } from '../models/candidature';
 import { CheckedMatchDTO } from '../models/CheckedMatchDTO';
 
 @Injectable({
@@ -63,12 +63,12 @@ export class CvMatchingServiceService {
   );
 }
 
-   getCandidaturesForOffre(offreId: number): Observable<candidature[]> {
+   getCandidaturesForOffre(offreId: number): Observable<Candidature[]> {
     const headers = new HttpHeaders({ 
       Authorization: `Bearer ${this.authService.getToken()}` 
     });
 
-    return this.http.get<candidature[]>(
+    return this.http.get<Candidature[]>(
       `http://localhost:8080/recruiter/${offreId}/candidatures`, 
       { headers }
     );
