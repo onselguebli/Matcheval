@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { MatchingApiResponse } from '../models/MatchingApiResponse';
 import { MatchingResult } from '../models/MatchingResult';
 import { AuthService } from './auth.service';
-import { Candidature } from '../models/candidature';
+import { Candidature } from '../models/Candidature.ts';
 import { CheckedMatchDTO } from '../models/CheckedMatchDTO';
 
 @Injectable({
