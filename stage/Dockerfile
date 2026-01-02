@@ -1,22 +1,10 @@
-FROM python:3.11-slim-bookworm
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
+COPY . .
+RUN mvn -q -DskipTests clean package
 
-RUN apt-get update \
- && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    build-essential \
-    git \
-    tesseract-ocr \
-    poppler-utils \
- && rm -rf /var/lib/apt/lists/*
-
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY app ./app
-
-CMD sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+CMD sh -c "java -jar app.jar --server.port=${PORT:-8080}"
