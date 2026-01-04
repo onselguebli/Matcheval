@@ -35,7 +35,13 @@
             "preserveSymlinks": true,
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+    "glob": "**/*",
+    "input": "src",
+    "output": "/"
+  }
+
             ],
             "styles": [
               "src/scss/styles.scss"
