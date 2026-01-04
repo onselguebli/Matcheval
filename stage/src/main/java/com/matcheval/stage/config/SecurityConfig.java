@@ -38,11 +38,12 @@ private JWTFilter jwtFilter;
         return  http.cors(Customizer.withDefaults()) // Ajouté pour activer le filtre CORS
                 .csrf(customizer -> customizer.disable()).
                 authorizeHttpRequests(request -> request
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/recruiter/login")
                         .permitAll()
                         .requestMatchers("/admin/**").hasAnyRole(Roles.ADMIN.name())
-                        .requestMatchers("manager/**").hasAnyRole(Roles.MANAGER.name())
-                        .requestMatchers("recruiter/**").hasAnyRole(Roles.RECRUITER.name())
+                        .requestMatchers("/manager/**").hasAnyRole(Roles.MANAGER.name())
+                        .requestMatchers("/recruiter/**").hasAnyRole(Roles.RECRUITER.name())
                         // --- Pair combinations
                         .requestMatchers("/admin-manager/**").hasAnyRole("ADMIN","MANAGER")
                         .requestMatchers("/admin-recruiter/**").hasAnyRole("ADMIN","RECRUITER")
@@ -61,7 +62,10 @@ private JWTFilter jwtFilter;
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200")); // ton front Angular
+        config.setAllowedOrigins(List.of(
+                "http://localhost:4200",
+                "https://matcheval-frontend.onrender.com"
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
