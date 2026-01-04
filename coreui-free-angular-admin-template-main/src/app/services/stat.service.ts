@@ -5,12 +5,13 @@ import { Observable } from 'rxjs';
 import { TrafficDashboardDTO } from '../models/TrafficDashboar';
 import { SiteStatsDTO } from '../models/SiteStatsDTO';
 import { SiteTypeCount } from '../models/SiteTypeCount';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StatService {
- private BASE_URL="http://localhost:8080";
+ private BASE_URL=environment.apiUrl;
 
    constructor(private http: HttpClient,
     private authService : AuthService

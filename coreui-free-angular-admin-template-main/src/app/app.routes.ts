@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { RoleGuard } from '../app/guards/role.guard';
-import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 
 export const routes: Routes = [

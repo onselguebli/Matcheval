@@ -5,11 +5,12 @@ import { ReqRes } from '../models/ReqRes';
 import { AuthService } from './auth.service';
 import { Observable } from 'rxjs';
 import { User } from '../models/User';
+import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
- private BASE_URL="http://localhost:8080";
+ private BASE_URL=environment.apiUrl;
 
    constructor(private http: HttpClient,
     private authService : AuthService

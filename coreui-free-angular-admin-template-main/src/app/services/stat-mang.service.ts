@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface OverviewManager {
   totalRecruiters: number;
@@ -27,7 +28,7 @@ export interface MeetingDto { id: number; title: string; roomName: string; start
 
 export class StatMangService {
 
-     private base = 'http://localhost:8080/manager/stats';
+     private base = environment.apiUrl+'/manager/stats';
 
   constructor(
     private http: HttpClient,

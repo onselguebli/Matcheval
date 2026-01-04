@@ -7,13 +7,14 @@ import { MatchingResult } from '../models/MatchingResult';
 import { AuthService } from './auth.service';
 import { Candidature } from '../models/candidature';
 import { CheckedMatchDTO } from '../models/CheckedMatchDTO';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CvMatchingServiceService {
-  private apiUrl = 'http://localhost:8080/recruiter/matching';
-   private baseUrl = 'http://localhost:8080';     
+  private apiUrl = environment.apiUrl+'/recruiter/matching';
+   private baseUrl = environment.apiUrl;     
 
   constructor(
     private http: HttpClient,
@@ -69,7 +70,8 @@ export class CvMatchingServiceService {
     });
 
     return this.http.get<Candidature[]>(
-      `http://localhost:8080/recruiter/${offreId}/candidatures`, 
+
+     `${this.baseUrl}/recruiter/${offreId}/candidatures`, 
       { headers }
     );
   }

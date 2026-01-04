@@ -4,13 +4,14 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { OffreWithCandidaturesDTO } from '../models/OffreWithCandidaturesDTO'; // Adjust the import path as necessary
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserserviceService {
  
-  private BASE_URL="http://localhost:8080";
+  private BASE_URL=environment.apiUrl;
 
    constructor(private http: HttpClient,
     private router: Router,

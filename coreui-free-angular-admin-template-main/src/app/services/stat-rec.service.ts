@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { TrafficDashboardDTO } from '../models/TrafficDashboar';
-import { SiteStatsDTO } from '../models/SiteStatsDTO';
 import { SiteTypeCount } from '../models/SiteTypeCount';
+import { environment } from '../../environments/environment';
 export interface OverviewStats {
   totalOffers: number;
   activeOffers: number;
@@ -24,7 +23,7 @@ export interface OfferTop { id: number; titre: string; datePublication: string; 
 })
 export class StatRecService {
 
- private BASE_URL="http://localhost:8080/recruiter/stats";
+ private BASE_URL=environment.apiUrl+'/recruiter/stats';
 
    constructor(private http: HttpClient,
     private authService : AuthService

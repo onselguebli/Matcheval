@@ -1,5 +1,7 @@
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
+
 import {
   provideRouter,
   withEnabledBlockingInitialNavigation,

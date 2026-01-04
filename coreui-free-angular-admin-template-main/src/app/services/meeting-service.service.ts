@@ -3,13 +3,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Meeting } from '../models/Meeting';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MeetingServiceService {
 
-   private baseUrl = 'http://localhost:8080/manager/meetings';
+   private baseUrl = environment.apiUrl + '/manager/meetings';
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 
