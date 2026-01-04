@@ -7,6 +7,7 @@ import com.matcheval.stage.repo.OffreRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,8 @@ public class MatchingService {
 
     private final RestTemplate restTemplate;
 
-    private final String FASTAPI_URL = "http://localhost:8000";
+    @Value("${fastapi.url}")
+    private String fastapiUrl;
 
     public Map<String, Object> matchCvWithOffre(Long offreId, MultipartFile cvFile) throws IOException {
         OffreEmploi offre = offreRepository.findById(offreId)
@@ -59,7 +61,7 @@ public class MatchingService {
         HttpEntity<?> requestEntity = new HttpEntity<>(bodyBuilder.build(), headers);
 
         ResponseEntity<Map> response = restTemplate.exchange(
-                FASTAPI_URL + "/match-multiple",
+                fastapiUrl + "/match-multiple",
                 HttpMethod.POST,
                 requestEntity,
                 Map.class
@@ -128,7 +130,7 @@ public class MatchingService {
         HttpEntity<?> requestEntity = new HttpEntity<>(bodyBuilder.build(), headers);
 
         ResponseEntity<Map> response = restTemplate.exchange(
-                FASTAPI_URL + "/match-multiple",
+                fastapiUrl + "/match-multiple",
                 HttpMethod.POST,
                 requestEntity,
                 Map.class
