@@ -160,7 +160,8 @@ public interface OffreRepo extends JpaRepository<OffreEmploi,Long> {
             String managerEmail,
             org.springframework.data.domain.Pageable pageable
     );
-
+    boolean existsByTitreAndRecruteurEmail(String titre, String email);
+    OffreEmploi findFirstByTitreAndRecruteurEmail(String titre, String email);
 }
 
 

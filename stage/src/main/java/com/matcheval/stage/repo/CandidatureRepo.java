@@ -188,5 +188,7 @@ long countAllForManager(String managerEmail);
     ) x
   """, nativeQuery = true)
     Double avgCandidatesPerOffer(String managerEmail);
+
+    boolean existsByOffreIdAndCandidatEmail(Long offreId, String candidatEmail);
 }
 

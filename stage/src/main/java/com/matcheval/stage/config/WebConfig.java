@@ -16,7 +16,8 @@ public class WebConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "http://localhost:4200",
-                                "https://matcheval-frontend.onrender.com"
+                                "https://matcheval-frontend.onrender.com",
+                                "https://matcheval-ia-1.onrender.com"
                         )
                         .allowedMethods("*")
                         .allowedHeaders("*");

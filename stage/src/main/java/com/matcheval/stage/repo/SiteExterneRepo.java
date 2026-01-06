@@ -12,6 +12,7 @@ public interface SiteExterneRepo extends JpaRepository<SiteExterne,Long> {
             "FROM SiteExterne s " +
             "GROUP BY EXTRACT(MONTH FROM s.dateA)")
     List<Object[]> countSitesByMonth();
-
+    boolean existsByNom(String nom);
+    SiteExterne findByNom(String nom);
 
 }

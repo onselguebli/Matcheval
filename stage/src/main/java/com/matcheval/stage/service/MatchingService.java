@@ -1,5 +1,7 @@
 package com.matcheval.stage.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.matcheval.stage.model.Candidature;
 import com.matcheval.stage.model.OffreEmploi;
 import com.matcheval.stage.repo.CandidatureRepo;
@@ -125,7 +127,13 @@ public class MatchingService {
 
         var bodyBuilder = new MultipartBodyBuilder();
         bodyBuilder.part("files", cvFile.getResource());
-        bodyBuilder.part("job_json", jobData);
+        try {
+            bodyBuilder.part("job_json", new ObjectMapper().writeValueAsString(jobData))
+                    .header("Content-Type", "application/json");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
 
         HttpEntity<?> requestEntity = new HttpEntity<>(bodyBuilder.build(), headers);
 

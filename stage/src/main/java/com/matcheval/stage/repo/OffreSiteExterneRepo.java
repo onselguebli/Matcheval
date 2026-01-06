@@ -51,4 +51,6 @@ FROM SiteExterne s
     ORDER BY count DESC
   """, nativeQuery = true)
     List<Object[]> candidaturesBySource(@Param("email") String email, @Param("days") int days);
+
+    boolean existsByOffreIdAndSiteExterneId(Long offreId, Long siteId);
 }
