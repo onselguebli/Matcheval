@@ -14,7 +14,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("recruiter/matching")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:4200"})
+@CrossOrigin(origins = {"http://localhost:4200","https://matcheval-frontend.onrender.com/"})
 public class MatchingController {
 
 
@@ -25,12 +25,8 @@ public class MatchingController {
     public ResponseEntity<Map<String, Object>> matchUploadedCv(
             @PathVariable Long offreId,
             @RequestParam("cv") MultipartFile cvFile) {
-        try {
-            Map<String, Object> result = matchingService.matchCvWithOffre(offreId, cvFile);
-            return ResponseEntity.ok(result);
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body(Map.of("error", "Erreur de traitement du CV"));
-        }
+        Map<String, Object> result = matchingService.matchCvWithOffre(offreId, cvFile);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{offreId}/all-cvs")
