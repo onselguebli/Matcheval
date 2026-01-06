@@ -24,6 +24,8 @@ export class CvMatchingServiceService {
   matchUploadedCv(offreId: number, cvFile: File): Observable<MatchingResult> {
     const formData = new FormData();
     formData.append('cv', cvFile);
+    const token = this.authService.getToken();
+  console.log('TOKEN envoyé:', token);
     const headers = new HttpHeaders({ 
       Authorization: `Bearer ${this.authService.getToken()}` 
     });
@@ -36,10 +38,13 @@ export class CvMatchingServiceService {
       map(response => {
         if (response.results && response.results.length > 0) {
           return response.results[0];
+
         }
         throw new Error('Aucun résultat trouvé dans la réponse');
       })
+      
     );
+    
   }
 
   matchAllCvsForOffre(offreId: number): Observable<MatchingResult[]> {
@@ -51,12 +56,15 @@ export class CvMatchingServiceService {
       `${this.apiUrl}/${offreId}/all-cvs`, 
       { headers }
     );
+
   }
 
   getCvMatchDetails(offreId: number, candidatureId: number): Observable<any> {
   const headers = new HttpHeaders({ 
     Authorization: `Bearer ${this.authService.getToken()}` 
   });
+  console.log("TOKEN", this.authService.getToken());
+
 
   return this.http.get<any>(
     `${this.apiUrl}/${offreId}/candidature/${candidatureId}`, 
