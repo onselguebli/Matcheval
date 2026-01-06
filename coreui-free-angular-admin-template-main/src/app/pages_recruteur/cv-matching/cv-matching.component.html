@@ -22,7 +22,7 @@
         [disabled]="loadingOffres || offres.length === 0">
         <option value="">-- Choisir une offre --</option>
         <option *ngFor="let offre of offres" [value]="offre.id">
-          {{ offre.titre }} - {{ offre.localisation }} ({{ offre.datePublication | date:'dd/MM/yyyy' }})
+          {{ offre.titre }} - {{ offre.localisation}} ({{ offre.datePublication | date:'dd/MM/yyyy' }})
         </option>
       </select>
 
@@ -257,7 +257,7 @@
           </div>
           <div class="info-item" *ngIf="result.cv_extracted?.years_experience !== undefined">
             <span class="info-icon">⏳</span>
-            <span>{{ result.cv_extracted.years_experience }} ans d'expérience</span>
+            <span>{{ result?.cv_extracted?.years_experience ?? 'N/A' }} ans d'expérience</span>
           </div>
           <div class="info-item" *ngIf="result.cv_extracted?.location">
             <span class="info-icon">📍</span>
